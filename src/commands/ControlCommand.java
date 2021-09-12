@@ -19,11 +19,17 @@ public class ControlCommand extends Command {
         Configuration config = HackControl.getConfig();
 
         if ((sender instanceof ProxiedPlayer)) {
+            ProxiedPlayer p = (ProxiedPlayer) sender;
+
+            if(!(p.hasPermission("hackcontrol.control"))) {
+                p.sendMessage(new ComponentBuilder(config.get("No_Permission").toString()).create());
+                return;
+            }
+
             if(args.length > 0) {
                 if(ProxyServer.getInstance().getPlayer(args[0]) != null) {
                     // Send both players to the Hack Control Server
                     ProxiedPlayer target = (ProxiedPlayer) ProxyServer.getInstance().getPlayer(args[0]);
-                    ProxiedPlayer p = (ProxiedPlayer) sender;
 
                     target.sendMessage(new ComponentBuilder(config.get("Target_Message").toString()).create());
                     p.sendMessage(new ComponentBuilder(config.get("Sender_Message").toString()).create());
@@ -31,11 +37,9 @@ public class ControlCommand extends Command {
                     target.connect(ProxyServer.getInstance().getServerInfo(config.get("Control_Server").toString()));
                     p.connect(ProxyServer.getInstance().getServerInfo(config.get("Control_Server").toString()));
                 } else {
-                    ProxiedPlayer p = (ProxiedPlayer) sender;
                     p.sendMessage(new ComponentBuilder(config.get("Target_Not_Found").toString()).create());
                 }
             } else {
-                ProxiedPlayer p = (ProxiedPlayer) sender;
                 p.sendMessage(new ComponentBuilder(config.get("No_Target").toString()).create());
             }
         }
