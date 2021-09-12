@@ -64,7 +64,8 @@ public final class HackControl extends Plugin {
                 newConfig.set("Sender_Message", "§aYou are going to Hack Control a Player!");
                 newConfig.set("Target_Not_Found", "§cThat player wasn't found in the Proxy Server!");
                 newConfig.set("No_Target", "§cYou didn't specify a Player to Control!");
-
+                newConfig.set("No_Permission", "§cYou do not have the permission to use that command!");
+                
                 ConfigurationProvider.getProvider(YamlConfiguration.class).save(newConfig, configFile);
 
             } else {
