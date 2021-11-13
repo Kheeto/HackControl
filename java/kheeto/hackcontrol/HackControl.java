@@ -36,8 +36,6 @@ public final class HackControl extends Plugin {
     @Override
     public void onDisable() {
         getLogger().severe("PLUGIN HAS BEEN DISABLED!");
-        getLogger().severe("PLUGIN HAS BEEN DISABLED!");
-        getLogger().severe("PLUGIN HAS BEEN DISABLED!");
     }
 
     public static HackControl getInstance() {
@@ -57,19 +55,16 @@ public final class HackControl extends Plugin {
         try {
             // Check if the file already exists and if it doesn't, creates a new file.
             if(configFile.exists()) {
-                newConfig = ConfigurationProvider.getProvider(YamlConfiguration.class).load(configFile);
-
-                newConfig.set("Control_Server", "control");
-                newConfig.set("Target_Message", "§cYou are being moved to the Hack Control server!");
-                newConfig.set("Sender_Message", "§aYou are going to Hack Control a Player!");
-                newConfig.set("Target_Not_Found", "§cThat player wasn't found in the Proxy Server!");
-                newConfig.set("No_Target", "§cYou didn't specify a Player to Control!");
-                newConfig.set("No_Permission", "§cYou do not have the permission to use that command!");
-                
+                newConfig = setConfigValues(configFile);
                 ConfigurationProvider.getProvider(YamlConfiguration.class).save(newConfig, configFile);
-
             } else {
-                configFile.createNewFile();
+                if(configFile.createNewFile()) {
+                    newConfig = setConfigValues(configFile);
+                    ConfigurationProvider.getProvider(YamlConfiguration.class).save(newConfig, configFile);
+                } else {
+                    getLogger().severe("Couldn't create a new config file");
+                };
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -78,4 +73,19 @@ public final class HackControl extends Plugin {
         return newConfig;
 
     };
+
+    private Configuration setConfigValues(File file) throws IOException {
+        Configuration cfg = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
+
+        cfg.set("Control_Server", "control");
+        cfg.set("Target_Message", "§cYou are being moved to the Hack Control server!");
+        cfg.set("Sender_Message", "§aYou are going to Hack Control a Player!");
+        cfg.set("Target_Not_Found", "§cThat player wasn't found in the Proxy Server!");
+        cfg.set("No_Target", "§cYou didn't specify a Player to Control!");
+        cfg.set("No_Permission", "§cYou do not have the permission to use that command!");
+
+        return cfg;
+    }
+
+
 }
