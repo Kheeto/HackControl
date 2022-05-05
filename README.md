@@ -1,5 +1,12 @@
 # HackControl
-Spostare sia lo staffer che il giocatore in un server separato per i controlli hack
+Plugin bungee per i controlli hack, mentre il server spigot dei controlli avrà un plugin interno, separato.
 
-# Aggiunte
-### Nuova configurazione
+### (Nuova configurazione)
+
+| Comandi    | Descrizione |
+| ------------- |-------------|
+| /control [player] | Sposta lo staff e il player nel server dei controlli |
+  
+| Permessi    | Descrizione |
+| ------------- |-------------|
+| hackcontrol.control | Permesso di usare /control, verrà dato solo<br>agli staff che fanno i controlli |
