@@ -1,47 +1,93 @@
 package kheeto.hackcontrol.commands;
 
+import kheeto.hackcontrol.CommandBase;
 import kheeto.hackcontrol.HackControl;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Command;
-import net.md_5.bungee.config.Configuration;
+import kheeto.hackcontrol.Message;
+import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class ControlCommand extends Command {
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.UUID;
 
-    public ControlCommand() {
-        super("Control");
+public class Control {
+    private static Control instance;
+    private Dictionary<UUID, UUID> controlList; // PlayerUUID, StafferUUID
+
+    public Control(HackControl plugin) {
+        instance = this;
+
+        new CommandBase("control", false) {
+            @Override
+            public boolean onCommand(CommandSender sender, String[] args) {
+                if (args.length == 0) {
+                    Message.send(sender, plugin.getConfig().getStringList("help.control").toString());
+                    return true;
+                }
+
+                // Starts a new hack control
+                if (args[0] == "start") {
+                    Player target = Bukkit.getPlayer(args[1]);
+
+                    // Executed from console
+                    if (!(sender instanceof Player)) {
+                        Message.send(sender, plugin.getConfig().getString("errors.notPlayer"));
+                        return false;
+                    }
+                    // Executed by a player
+                    if (controlList.get(target.getUniqueId()) == Bukkit.getPlayer(sender.getName()).getUniqueId()) {
+                        if (sender.hasPermission("hackcontrol.control.start")) {
+                            controlList.put(target.getUniqueId(), ((Player) sender).getUniqueId());
+                            return true;
+                        }
+                        else Message.send(sender, plugin.getConfig().getString("errors.noPermission"));
+                    }
+                }
+
+                // Stops an hack control that is currently ongoing
+                if (args[0] == "cancel") {
+                    Player target = Bukkit.getPlayer(args[1]);
+
+                    // Executed from console
+                    if (!(sender instanceof Player)) {
+                        controlList.remove(target.getUniqueId());
+                        return true;
+                    }
+                    // Executed by the same staffer who is controlling the player
+                    if (controlList.get(target.getUniqueId()) == Bukkit.getPlayer(sender.getName()).getUniqueId()) {
+                        if (sender.hasPermission("hackcontrol.control.cancel")) {
+                            controlList.remove(target.getUniqueId());
+                            return true;
+                        }
+                        else Message.send(sender, plugin.getConfig().getString("errors.noPermission"));
+                    }
+                    // Executed by another staffer
+                    else {
+                        if (sender.hasPermission("hackcontrol.control.cancel.others")) {
+                            controlList.remove(target.getUniqueId());
+                            return true;
+                        }
+                        else Message.send(sender, plugin.getConfig().getString("errors.noPermission"));
+                    }
+                }
+
+                if (args[0] == "setup") {
+
+                }
+
+                return false;
+            }
+
+            @Override
+            public String getUsage() {
+                return "/control";
+            }
+        };
     }
 
-    public void execute(CommandSender sender, String[] args) {
-        Configuration config = HackControl.getConfig();
-
-        if ((sender instanceof ProxiedPlayer)) {
-            ProxiedPlayer p = (ProxiedPlayer) sender;
-
-            if(!(p.hasPermission("hackcontrol.control"))) {
-                p.sendMessage(new ComponentBuilder(config.get("No_Permission").toString()).create());
-                return;
-            }
-
-            if(args.length > 0) {
-                if(ProxyServer.getInstance().getPlayer(args[0]) != null) {
-                    // Send both players to the Hack Control Server
-                    ProxiedPlayer target = (ProxiedPlayer) ProxyServer.getInstance().getPlayer(args[0]);
-
-                    target.sendMessage(new ComponentBuilder(config.get("Target_Message").toString()).create());
-                    p.sendMessage(new ComponentBuilder(config.get("Sender_Message").toString()).create());
-
-                    target.connect(ProxyServer.getInstance().getServerInfo(config.get("Control_Server").toString()));
-                    p.connect(ProxyServer.getInstance().getServerInfo(config.get("Control_Server").toString()));
-                } else {
-                    p.sendMessage(new ComponentBuilder(config.get("Target_Not_Found").toString()).create());
-                }
-            } else {
-                p.sendMessage(new ComponentBuilder(config.get("No_Target").toString()).create());
-            }
-        }
+    public Control getInstance() {
+        return instance;
     }
 }
