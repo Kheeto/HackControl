@@ -1,20 +1,3 @@
-# Positions
-staffPos:
-  world: spawn
-  x: 0
-  y: 0
-  z: 0
-playerPos:
-  world: spawn
-  x: 0
-  y: 0
-  z: 0
-endPos:
-  world: spawn
-  x: 0
-  y: 0
-  z: 0
-
 # Messages
 prefix: "&8[&3HackControl&8] "
 control:
@@ -44,9 +27,30 @@ errors:
   immunePlayer: "&cThat player is immune to this command."
   noPermission: "&cYou don't have the permission to execute that command!"
   notPlayer: "&cOnly players can execute that command!"
+configReload: "&aYou successfully reloaded the config."
 
-# Ban if leaving during control
+# Should the player be automatically freezed in an hack control? (cannot move)
+freezeDuringControl: false
+# Ban user if he leaves during an hack control
 leaveBan:
   enabled: false
   duration: 7d
   reason: "You left during an hack control"
+
+# Spawn Positions
+# You can edit these with /control setup
+staffPos:
+  world: spawn
+  x: 0
+  y: 0
+  z: 0
+playerPos:
+  world: spawn
+  x: 0
+  y: 0
+  z: 0
+endPos:
+  world: spawn
+  x: 0
+  y: 0
+  z: 0
