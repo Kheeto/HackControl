@@ -1,0 +1,52 @@
+# Positions
+staffPos:
+  world: spawn
+  x: 0
+  y: 0
+  z: 0
+playerPos:
+  world: spawn
+  x: 0
+  y: 0
+  z: 0
+endPos:
+  world: spawn
+  x: 0
+  y: 0
+  z: 0
+
+# Messages
+prefix: "&8[&3HackControl&8] "
+control:
+  stafferControlMessage: "&7You started an Hack Control on %player%"
+  stafferEndMessage: "&7The Hack Control was cancelled."
+  playerControlMessage: "&7An hack control was started on you! A staffer will check if you are using any cheats and in that case, he will ban you. &cDo not leave and listen to the instructions."
+  playerEndMessage: "&7Your Hack Control was cancelled."
+freeze:
+  stafferFreezeMessage: "&7You &cfreezed &7%player%."
+  stafferUnfreezeMessage: "&7You &aunfreezed &7%player%."
+  playerFreezeMessage: "&7You have been &cfreezed &7by a moderator."
+  playerUnfreezeMessage: "&7You have been &aunfreezed &7by a moderator."
+help:
+  freeze:
+    - "/freeze <player>"
+    - "/unfreeze <player>"
+  control:
+    - "&3/control start <player>"
+    - "&3/control cancel <player>"
+    - "&3/control setup"
+  controlSetup:
+    - "&3/control setup stafferPos"
+    - "&3/control setup playerPos"
+    - "&3/control setup endPos"
+errors:
+  noPlayer: "&cYou need to specify a player!"
+  immunePlayer: "&cThat player is immune to this command."
+  noPermission: "&cYou don't have the permission to execute that command!"
+  notPlayer: "&cOnly players can execute that command!"
+
+# Ban if leaving during control
+leaveBan:
+  enabled: false
+  duration: 7d
+  reason: "You left during an hack control"
