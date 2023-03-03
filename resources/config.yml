@@ -53,7 +53,9 @@ freezeDuringControl: false
 # Ban user if he leaves during an hack control
 leaveBan:
   enabled: false
-  duration: 7d
+  ipBan: false
+  # Enter the time in hours! (can be decimal)
+  duration: 168
   reason: "You left during an hack control"
 
 # Spawn Positions
