@@ -27,7 +27,12 @@ errors:
   immunePlayer: "&cThat player is immune to this command."
   noPermission: "&cYou don't have the permission to execute that command!"
   notPlayer: "&cOnly players can execute that command!"
+  spawnLocations: "&cThere was an issue with loading the spawn locations.";
 configReload: "&aYou successfully reloaded the config."
+setup:
+  stafferPos: "&aSuccessfully set the Staffer spawn position."
+  playerPos: "&aSuccessfully set the Player spawn position."
+  endPos: "&aSuccessfully set the end position."
 
 # Should the player be automatically freezed in an hack control? (cannot move)
 freezeDuringControl: false
@@ -39,18 +44,24 @@ leaveBan:
 
 # Spawn Positions
 # You can edit these with /control setup
-staffPos:
-  world: spawn
+stafferPos:
+  world: world
   x: 0
   y: 0
   z: 0
+  yaw: 0.0
+  pitch: 0.0
 playerPos:
-  world: spawn
+  world: world
   x: 0
   y: 0
   z: 0
+  yaw: 0.0
+  pitch: 0.0
 endPos:
-  world: spawn
+  world: world
   x: 0
   y: 0
   z: 0
+  yaw: 0.0
+  pitch: 0.0
