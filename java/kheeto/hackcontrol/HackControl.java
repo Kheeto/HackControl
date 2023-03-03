@@ -15,7 +15,7 @@ public final class HackControl extends JavaPlugin {
 
         saveDefaultConfig();
 
-        new Control(this);
+        new Control(this).LoadLocations();
     }
 
     @Override
