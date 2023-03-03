@@ -1,24 +1,34 @@
 # HackControl
-Plugin spigot per i controlli hack, permette di freezare un player e metterlo in modalità controllo.
+Version: 1.19.3 (spigot/paper)
 
-| Comandi    | Descrizione |
+The purpose of this plugin is making it easier to manage hack controls,
+you can teleport players to a specific location and have a private chat,
+then you can check if they are using cheats through third party tools.
+
+## Features
+- Put players in hack control mode
+- Stop an hack control at any time
+- Set an automatic ban for players who leave during an hack control
+- Easily change the hack control locations using in-game commands
+- Freezing players
+
+| Command    | Description |
 | ------------- |-------------|
-| /control start [player] | Mette il player in controllo hack |
-| /control cancel [player] | Termina il controllo hack se non sono stati trovati cheat |
-| /control setup | Permette di settare le posizioni di spawn del controllo hack |
-| /control reload | Ricarica la configurazione del plugin |
-| /freeze [player] | Mette un giocatore in freeze (non può muoversi) |
-| /unfreeze [player] | Rimuove il freeze di un giocatore |
-  
-| Permessi    | Descrizione |
+| /control start [player] | Starts an hack control |
+| /control cancel [player] | Ends an hack control |
+| /control setup | Lets you set spawn positions for the hack controls |
+| /control reload | Reloads the plugin configuration |
+| /freeze [player] <true/false> | Freeze or unfreeze a player |
+<br>
+
+| Permission    | Description / Command |
 | ------------- |-------------|
-| hackcontrol.control | Permesso di usare /control |
-| hackcontrol.control.start | Permesso di usare /control start |
-| hackcontrol.control.cancel | Permesso di usare /control cancel |
-| hackcontrol.control.cancel.others | Permesso di usare /control cancel<br>su player controllati da altri staffer |
-| hackcontrol.control.setup | Permesso di usare /control setup |
-| hackcontrol.control.reload | Permesso di usare /control reload |
-| hackcontrol.control.bypass | Rende il player immune ai controlli hack |
-| hackcontrol.freeze.bypass | Rende il player immune allo /freeze |
-| hackcontrol.freeze | Permesso di usare /freeze |
-| hackcontrol.unfreeze | Permesso di usare /unfreeze |
+| hackcontrol.control | /control |
+| hackcontrol.control.start | /control start |
+| hackcontrol.control.cancel | /control cancel |
+| hackcontrol.control.cancel.others | /control cancel on players <br>controlled by other staffers |
+| hackcontrol.control.setup | /control setup |
+| hackcontrol.control.reload | /control reload |
+| hackcontrol.control.bypass | You cannot hack control this player |
+| hackcontrol.freeze.bypass | You cannot freeze this player |
+| hackcontrol.freeze | /freeze |
