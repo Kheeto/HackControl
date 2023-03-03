@@ -1,5 +1,6 @@
-package kheeto.hackcontrol;
+package kheeto.hackcontrol.util;
 
+import kheeto.hackcontrol.HackControl;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,7 +10,6 @@ import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.SimplePluginManager;
 
-import java.awt.image.MemoryImageSource;
 import java.lang.reflect.Field;
 
 public abstract class CommandBase extends BukkitCommand implements CommandExecutor {
