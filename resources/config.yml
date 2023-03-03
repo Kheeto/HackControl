@@ -32,6 +32,7 @@ errors:
   notFrozen: "&cThat player is not currently frozen."
   alreadyFrozen: "&cThat player is already frozen!"
   alreadyControlled: "&cThat player is already in an hack control!"
+  noControl: "&cThat player is not in an hack control!"
 configReload: "&aYou successfully reloaded the config."
 setup:
   stafferPos: "&aSuccessfully set the Staffer spawn position."
