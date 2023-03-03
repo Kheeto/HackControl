@@ -1,11 +1,8 @@
 package kheeto.hackcontrol.commands;
 
 import kheeto.hackcontrol.HackControl;
-import kheeto.hackcontrol.util.CommandBase;
 import kheeto.hackcontrol.util.Message;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,9 +11,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDamageEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Freeze implements CommandExecutor, Listener, TabCompleter {
@@ -112,6 +113,38 @@ public class Freeze implements CommandExecutor, Listener, TabCompleter {
     @EventHandler
     private void onPlayerMove(PlayerMoveEvent e) {
         if (frozenPlayers.contains(e.getPlayer()))
+            e.setCancelled(true);
+    }
+
+    @EventHandler
+    private void onPlayerDestroyBlock(BlockBreakEvent e) {
+        if (frozenPlayers.contains(e.getPlayer()))
+            e.setCancelled(true);
+    }
+
+    @EventHandler
+    private void onPlayerPlaceBlock(BlockPlaceEvent e) {
+        if (frozenPlayers.contains(e.getPlayer()))
+            e.setCancelled(true);
+    }
+
+    @EventHandler
+    private void onPlayerDamageBlock(BlockDamageEvent e) {
+        if (frozenPlayers.contains(e.getPlayer()))
+            e.setCancelled(true);
+    }
+
+    @EventHandler
+    private void onPlayerInteract(PlayerInteractEvent e) {
+        if (frozenPlayers.contains(e.getPlayer()))
+            e.setCancelled(true);
+    }
+
+    @EventHandler
+    private void onPlayerPvP(EntityDamageByEntityEvent e) {
+        if (frozenPlayers.contains(e.getDamager()))
+            e.setCancelled(true);
+        if (frozenPlayers.contains(e.getEntity()))
             e.setCancelled(true);
     }
 
