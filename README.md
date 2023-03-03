@@ -11,11 +11,12 @@ Plugin spigot per i controlli hack, permette di freezare un player e metterlo in
   
 | Permessi    | Descrizione |
 | ------------- |-------------|
-| hackcontrol.control.bypass | Rende il player immune ai controlli hack |
+| hackcontrol.control | Permesso di usare /control |
 | hackcontrol.control.start | Permesso di usare /control start |
 | hackcontrol.control.cancel | Permesso di usare /control cancel |
 | hackcontrol.control.cancel.others | Permesso di usare /control cancel<br>su player controllati da altri staffer |
 | hackcontrol.control.setup | Permesso di usare /control setup |
+| hackcontrol.control.bypass | Rende il player immune ai controlli hack |
 | hackcontrol.freeze.bypass | Rende il player immune allo /freeze |
-| hackcontrol.freeze.execute | Permesso di usare /freeze |
-| hackcontrol.freeze.unfreeze | Permesso di usare /unfreeze |
+| hackcontrol.freeze | Permesso di usare /freeze |
+| hackcontrol.unfreeze | Permesso di usare /unfreeze |
