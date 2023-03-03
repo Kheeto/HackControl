@@ -16,6 +16,10 @@ public final class HackControl extends JavaPlugin {
         saveDefaultConfig();
 
         new Control(this).LoadLocations();
+
+        Freeze freeze = new Freeze();
+        getCommand("freeze").setExecutor(freeze);;
+        getCommand("unfreeze").setExecutor(freeze);;
     }
 
     @Override
