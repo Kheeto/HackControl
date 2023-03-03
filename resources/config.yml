@@ -1,43 +1,51 @@
+# HackControl plugin by Kheeto
+# Source code: https://github.com/Endless-Development/HackControl
+
+# {player} will be replaced with the target's name
+# {staffer} will be replaced with the message executor's name
 # Messages
 prefix: "&8[&3HackControl&8] "
 control:
-  stafferControlMessage: "&7You started an Hack Control on %player%"
-  stafferEndMessage: "&7The Hack Control was cancelled."
-  playerControlMessage: "&7An hack control was started on you! A staffer will check if you are using any cheats and in that case, he will ban you. &cDo not leave and listen to the instructions."
+  stafferControlMessage: "&7You started an Hack Control on &3{player}"
+  stafferEndMessage: "&7You cancelled the Hack Control on &3{player}."
+  stafferEndMessageOther: "&7Your Hack Control on &3{player} &7was cancelled by &c{staffer}."
+  playerControlMessage: "&7An hack control was started on you! A staffer will check if you are using any cheats and in that case, he will ban you. &c&nDo not leave and listen to the instructions."
   playerEndMessage: "&7Your Hack Control was cancelled."
 freeze:
-  stafferFreezeMessage: "&7You &cfrozen &7%player%."
-  stafferUnfreezeMessage: "&7You &aunfreezed &7%player%."
+  stafferFreezeMessage: "&7You &cfrozen &7{player}."
+  stafferUnfreezeMessage: "&7You &aunfreezed &7{player}."
   playerFreezeMessage: "&7You have been &cfrozen &7by a moderator."
   playerUnfreezeMessage: "&7You have been &aunfreezed &7by a moderator."
 help:
-  freeze:
-    - "/freeze <player>"
-    - "/unfreeze <player>"
   control:
-    - "&3/control start <player>"
-    - "&3/control cancel <player>"
-    - "&3/control setup"
+    - "&8&m----[&3 HackControl &8&m]----"
+    - "&7/control start <player>"
+    - "&7/control cancel <player>"
+    - "&7/control setup <options>"
+    - "&7/control reload"
+    - "&8&m---------------------"
   controlSetup:
+    - "&8&m----[&3 HackControl &8&m]----"
     - "&3/control setup stafferPos"
     - "&3/control setup playerPos"
     - "&3/control setup endPos"
+    - "&8&m---------------------"
 errors:
-  noPlayer: "&cYou need to specify a player!"
-  noPlayerFound: "&cThat player was not found online."
-  immunePlayer: "&cThat player is immune to this command."
-  noPermission: "&cYou don't have the permission to execute that command!"
-  notPlayer: "&cOnly players can execute that command!"
-  spawnLocations: "&cThere was an issue with loading the spawn locations.";
-  notFrozen: "&cThat player is not currently frozen."
-  alreadyFrozen: "&cThat player is already frozen!"
-  alreadyControlled: "&cThat player is already in an hack control!"
-  noControl: "&cThat player is not in an hack control!"
+  noPlayer: "&cYou need to specify a player."
+  noPlayerFound: "&cThe player &4{player} &cwas not found online."
+  immunePlayer: "&cThe player &4{player} &cis immune to this command."
+  noPermission: "&cYou don't have the permission to execute that command."
+  notPlayer: "&cOnly players can execute this command!"
+  spawnLocations: "&cThere was an issue with loading the spawn locations."
+  notFrozen: "&4{player} &cis not currently frozen."
+  alreadyFrozen: "&4{player} &cis already frozen!"
+  alreadyControlled: "&4{player} &cis already in an hack control."
+  noControl: "&cThere is currently no hack control on 4{player}&c."
 configReload: "&aYou successfully reloaded the config."
 setup:
-  stafferPos: "&aSuccessfully set the Staffer spawn position."
-  playerPos: "&aSuccessfully set the Player spawn position."
-  endPos: "&aSuccessfully set the end position."
+  stafferPos: "&eYou set the Staffer spawn position."
+  playerPos: "&eYou set the Player spawn position."
+  endPos: "&eYou set the end position."
 
 # Should the player be automatically freezed in an hack control? (cannot move)
 freezeDuringControl: false
