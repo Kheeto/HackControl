@@ -6,14 +6,19 @@ import kheeto.hackcontrol.util.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.List;
 import java.util.UUID;
 
-public class Control {
+public class Control implements CommandExecutor, TabCompleter {
     private static Control instance;
     private HackControl plugin;
     private Dictionary<UUID, UUID> controlList; // PlayerUUID, StafferUUID
@@ -25,182 +30,192 @@ public class Control {
     public Control(HackControl plugin) {
         instance = this;
         this.plugin = plugin;
+    }
 
-        new CommandBase("control", false) {
-            @Override
-            public boolean onCommand(CommandSender sender, String[] args) {
-                FileConfiguration config = plugin.getConfig();
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        FileConfiguration config = plugin.getConfig();
 
-                if (!sender.hasPermission("hackcontrol.control")) {
-                    Message.send(sender, config.getString("errors.noPermission"));
-                    return false;
-                }
+        if (!sender.hasPermission("hackcontrol.control")) {
+            Message.send(sender, config.getString("errors.noPermission"));
+            return true;
+        }
 
-                if (args.length == 0) {
-                    Message.send(sender, config.getStringList("help.control").toString());
-                    return true;
-                }
+        if (args.length == 0) {
+            for (String s : config.getStringList("help.control")) {
+                Message.send(sender, s);
+            }
+            return true;
+        }
 
-                // Starts a new hack control
-                if (args[0] == "start") {
-                    Player target = Bukkit.getPlayer(args[1]);
-                    if (target == null) Message.send(sender, config.getString("error.noPlayer"));
+        // Starts a new hack control
+        if (args[0] == "start") {
+            Player target = Bukkit.getPlayer(args[1]);
+            if (target == null) Message.send(sender, config.getString("error.noPlayer"));
 
-                    if (controlList.get(target) != null) {
-                        Message.send(sender, config.getString("errors.alreadyControlled"));
-                        return false;
-                    }
+            if (controlList.get(target) != null) {
+                Message.send(sender, config.getString("errors.alreadyControlled"));
+                return true;
+            }
 
-                    // Executed from console
-                    if (!(sender instanceof Player)) {
-                        Message.send(sender, config.getString("errors.notPlayer"));
-                        return false;
-                    }
-                    // Executed by a player
-                    if (controlList.get(target.getUniqueId()) == Bukkit.getPlayer(sender.getName()).getUniqueId()) {
-                        if (sender.hasPermission("hackcontrol.control.start")) {
-                            controlList.put(target.getUniqueId(), ((Player) sender).getUniqueId());
-                            Message.send(sender, config.getString("control.stafferControlMessage"));
-                            Message.send(target, config.getString("control.playerControlMessage"));
-                            StartControl(target, (Player)sender);
-                            return true;
-                        }
-                        else Message.send(sender, config.getString("errors.noPermission"));
-                    }
-                }
-
-                // Stops an hack control that is currently occurring
-                else if (args[0] == "cancel") {
-                    Player target = Bukkit.getPlayer(args[1]);
-                    if (target == null) Message.send(sender, config.getString("error.noPlayer"));
-
-                    // Executed from console
-                    if (!(sender instanceof Player)) {
-                        controlList.remove(target.getUniqueId());
-                        return true;
-                    }
-                    // Executed by the same staffer who is controlling the player
-                    if (controlList.get(target.getUniqueId()) == Bukkit.getPlayer(sender.getName()).getUniqueId()) {
-                        if (!sender.hasPermission("hackcontrol.control.cancel")) {
-                            Message.send(sender, config.getString("errors.noPermission"));
-                            return false;
-                        }
-                    }
-                    // Executed by another staffer
-                    else {
-                        if (!sender.hasPermission("hackcontrol.control.cancel.others")) {
-                            Message.send(sender, config.getString("errors.noPermission"));
-                            return false;
-                        }
-                    }
-
-                    // Removes the target from the list of players in hack control
-                    controlList.remove(target.getUniqueId());
+            // Executed from console
+            if (!(sender instanceof Player)) {
+                Message.send(sender, config.getString("errors.notPlayer"));
+                return true;
+            }
+            // Executed by a player
+            if (controlList.get(target.getUniqueId()) == Bukkit.getPlayer(sender.getName()).getUniqueId()) {
+                if (sender.hasPermission("hackcontrol.control.start")) {
+                    controlList.put(target.getUniqueId(), ((Player) sender).getUniqueId());
                     Message.send(sender, config.getString("control.stafferControlMessage"));
                     Message.send(target, config.getString("control.playerControlMessage"));
-                    EndControl(target, (Player)sender);
+                    StartControl(target, (Player)sender);
                     return true;
                 }
+                else Message.send(sender, config.getString("errors.noPermission"));
+            }
+        }
 
-                // Sets the spawn positions of the hack control
-                else if (args[0] == "setup") {
-                    if (!sender.hasPermission("hackcontrol.control.setup")) {
-                        Message.send(sender, config.getString("errors.noPermission"));
-                        return false;
-                    }
+        // Stops an hack control that is currently occurring
+        else if (args[0] == "cancel") {
+            Player target = Bukkit.getPlayer(args[1]);
+            if (target == null) Message.send(sender, config.getString("error.noPlayer"));
 
-                    if (!(sender instanceof Player)) {
-                        Message.send(sender, config.getString("errors.notPlayer"));
-                        return false;
-                    }
-
-                    if (args.length == 1) {
-                        Message.send(sender, config.getString("help.controlSetup"));
-                        return true;
-                    }
-                    Player p = (Player)sender;
-                    Location loc = p.getLocation();
-
-                    if (args[1] == "stafferPos") {
-                        config.set("stafferPos.world", loc.getWorld().getName());
-                        config.set("stafferPos.x", loc.getBlockX());
-                        config.set("stafferPos.y", loc.getBlockY());
-                        config.set("stafferPos.z", loc.getBlockZ());
-                        config.set("stafferPos.yaw", loc.getYaw());
-                        config.set("stafferPos.pitch", loc.getPitch());
-                        plugin.saveConfig();
-                        stafferPos = loc;
-
-                        Message.send(sender, config.getString("setup.stafferPos"));
-                        return true;
-                    }
-                    else if (args[1] == "playerPos") {
-                        config.set("playerPos.world", loc.getWorld().getName());
-                        config.set("playerPos.x", loc.getBlockX());
-                        config.set("playerPos.y", loc.getBlockY());
-                        config.set("playerPos.z", loc.getBlockZ());
-                        config.set("playerPos.yaw", loc.getYaw());
-                        config.set("playerPos.pitch", loc.getPitch());
-                        plugin.saveConfig();
-                        playerPos = loc;
-
-                        Message.send(sender, config.getString("setup.playerPos"));
-                        return true;
-                    }
-                    else if (args[1] == "endPos") {
-                        config.set("endPos.world", loc.getWorld().getName());
-                        config.set("endPos.x", loc.getBlockX());
-                        config.set("endPos.y", loc.getBlockY());
-                        config.set("endPos.z", loc.getBlockZ());
-                        config.set("endPos.yaw", loc.getYaw());
-                        config.set("endPos.pitch", loc.getPitch());
-                        plugin.saveConfig();
-                        endPos = loc;
-
-                        Message.send(sender, config.getString("setup.endPos"));
-                        return true;
-                    }
-                    else {
-                        Message.send(sender, config.getString("help.controlSetup"));
-                        return true;
-                    }
-                }
-
-                else {
-                    Message.send(sender, config.getStringList("help.control").toString());
+            // Executed from console
+            if (!(sender instanceof Player)) {
+                controlList.remove(target.getUniqueId());
+                return true;
+            }
+            // Executed by the same staffer who is controlling the player
+            if (controlList.get(target.getUniqueId()) == Bukkit.getPlayer(sender.getName()).getUniqueId()) {
+                if (!sender.hasPermission("hackcontrol.control.cancel")) {
+                    Message.send(sender, config.getString("errors.noPermission"));
                     return true;
                 }
-
-                return false;
             }
-
-            @Override
-            public String getUsage() {
-                return "/control";
-            }
-
-            private void StartControl(Player target, Player staffer) {
-                FileConfiguration config = plugin.getConfig();
-
-                target.teleport(playerPos);
-                staffer.teleport(stafferPos);
-
-                if(config.getBoolean("freezeDuringControl")) {
-                    Freeze.getInstance().FreezePlayer(target);
+            // Executed by another staffer
+            else {
+                if (!sender.hasPermission("hackcontrol.control.cancel.others")) {
+                    Message.send(sender, config.getString("errors.noPermission"));
+                    return true;
                 }
             }
 
-            private void EndControl(Player target, Player staffer) {
-                FileConfiguration config = plugin.getConfig();
+            // Removes the target from the list of players in hack control
+            controlList.remove(target.getUniqueId());
+            Message.send(sender, config.getString("control.stafferControlMessage"));
+            Message.send(target, config.getString("control.playerControlMessage"));
+            EndControl(target, (Player)sender);
+            return true;
+        }
 
-                target.teleport(endPos);
-                staffer.teleport(endPos);
-
-                if(config.getBoolean("freezeDuringControl")) {
-                    Freeze.getInstance().UnfreezePlayer(target);
-                }
+        // Sets the spawn positions of the hack control
+        else if (args[0] == "setup") {
+            if (!sender.hasPermission("hackcontrol.control.setup")) {
+                Message.send(sender, config.getString("errors.noPermission"));
+                return true;
             }
-        };
+
+            if (!(sender instanceof Player)) {
+                Message.send(sender, config.getString("errors.notPlayer"));
+                return true;
+            }
+
+            if (args.length == 1) {
+                for (String s : config.getStringList("help.controlSetup")) {
+                    Message.send(sender, s);
+                }
+                return true;
+            }
+            Player p = (Player)sender;
+            Location loc = p.getLocation();
+
+            if (args[1] == "stafferPos") {
+                config.set("stafferPos.world", loc.getWorld().getName());
+                config.set("stafferPos.x", loc.getBlockX());
+                config.set("stafferPos.y", loc.getBlockY());
+                config.set("stafferPos.z", loc.getBlockZ());
+                config.set("stafferPos.yaw", loc.getYaw());
+                config.set("stafferPos.pitch", loc.getPitch());
+                plugin.saveConfig();
+                stafferPos = loc;
+
+                Message.send(sender, config.getString("setup.stafferPos"));
+                return true;
+            }
+            else if (args[1] == "playerPos") {
+                config.set("playerPos.world", loc.getWorld().getName());
+                config.set("playerPos.x", loc.getBlockX());
+                config.set("playerPos.y", loc.getBlockY());
+                config.set("playerPos.z", loc.getBlockZ());
+                config.set("playerPos.yaw", loc.getYaw());
+                config.set("playerPos.pitch", loc.getPitch());
+                plugin.saveConfig();
+                playerPos = loc;
+
+                Message.send(sender, config.getString("setup.playerPos"));
+                return true;
+            }
+            else if (args[1] == "endPos") {
+                config.set("endPos.world", loc.getWorld().getName());
+                config.set("endPos.x", loc.getBlockX());
+                config.set("endPos.y", loc.getBlockY());
+                config.set("endPos.z", loc.getBlockZ());
+                config.set("endPos.yaw", loc.getYaw());
+                config.set("endPos.pitch", loc.getPitch());
+                plugin.saveConfig();
+                endPos = loc;
+
+                Message.send(sender, config.getString("setup.endPos"));
+                return true;
+            }
+            else {
+                for (String s : config.getStringList("help.controlSetup")) {
+                    Message.send(sender, s);
+                }
+                return true;
+            }
+        }
+
+        else if (args[0] == "reload") {
+            if (!sender.hasPermission("hackcontrol.control.reload")) {
+                Message.send(sender, config.getString("errors.noPermission"));
+                return true;
+            }
+
+            plugin.reloadConfig();
+            return true;
+        }
+
+        else {
+            for (String s : config.getStringList("help.control")) {
+                Message.send(sender, s);
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private void StartControl(Player target, Player staffer) {
+        FileConfiguration config = plugin.getConfig();
+
+        target.teleport(playerPos);
+        staffer.teleport(stafferPos);
+
+        if(config.getBoolean("freezeDuringControl")) {
+            Freeze.getInstance().FreezePlayer(target);
+        }
+    }
+
+    private void EndControl(Player target, Player staffer) {
+        FileConfiguration config = plugin.getConfig();
+
+        target.teleport(endPos);
+        staffer.teleport(endPos);
+
+        if(config.getBoolean("freezeDuringControl")) {
+            Freeze.getInstance().UnfreezePlayer(target);
+        }
     }
 
     public Control getInstance() {
@@ -208,13 +223,17 @@ public class Control {
     }
 
     public void LoadLocations() {
+        LoadLocation(stafferPos, "stafferPos");
+        LoadLocation(playerPos, "playerPos");
+        LoadLocation(endPos, "endPos");
+    }
+
+    private void LoadLocation(Location location, String name) {
         FileConfiguration config = plugin.getConfig();
 
-        // Staffer Spawn Position
-        Location stafferPos = null;
-        String worldName = config.getString("stafferPos.world");
+        String worldName = config.getString(name + ".world");
         if (worldName == null) {
-            Bukkit.getLogger().severe("stafferPos.world doesn't exist within config.yml, could not load spawn location.");
+            Bukkit.getLogger().severe(name + ".world doesn't exist within config.yml, could not load spawn location.");
             return;
         }
         World world = Bukkit.getWorld(worldName);
@@ -222,52 +241,46 @@ public class Control {
             Bukkit.getLogger().severe("Could not find world \"" + worldName + "\", could not load spawn location.");
             return;
         }
-        stafferPos.setWorld(world);
-        stafferPos.setX(config.getDouble("stafferPos.x"));
-        stafferPos.setY(config.getDouble("stafferPos.y"));
-        stafferPos.setZ(config.getDouble("stafferPos.z"));
-        stafferPos.setYaw((float)config.getDouble("stafferPos.yaw"));
-        stafferPos.setPitch((float)config.getDouble("stafferPos.pitch"));
-        this.stafferPos = stafferPos;
+        int x = config.getInt(name + ".x");
+        int y = config.getInt(name + ".y");
+        int z = config.getInt(name + ".z");
+        float yaw = (float)config.getDouble(name + ".yaw");
+        float pitch = (float)config.getDouble(name + ".pitch");
+        this.stafferPos = new Location(world, x, y, z, yaw, pitch);
+    }
 
-        // Target Spawn Position
-        Location playerPos = null;
-        String worldName2 = config.getString("playerPos.world");
-        if (worldName2 == null) {
-            Bukkit.getLogger().severe("playerPos.world doesn't exist within config.yml, could not load spawn location.");
-            return;
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+        List<String> playerNames = new ArrayList<>();
+        Player[] players = new Player[Bukkit.getServer().getOnlinePlayers().toArray().length];
+        Bukkit.getServer().getOnlinePlayers().toArray(players);
+        for (Player p : players) {
+            playerNames.add(p.getName());
         }
-        World world2 = Bukkit.getWorld(worldName);
-        if (world2 == null) {
-            Bukkit.getLogger().severe("Could not find world \"" + worldName2 + "\", could not load spawn location.");
-            return;
-        }
-        playerPos.setWorld(world2);
-        playerPos.setX(config.getDouble("playerPos.x"));
-        playerPos.setY(config.getDouble("playerPos.y"));
-        playerPos.setZ(config.getDouble("playerPos.z"));
-        playerPos.setYaw((float)config.getDouble("playerPos.yaw"));
-        playerPos.setPitch((float)config.getDouble("playerPos.pitch"));
-        this.playerPos = playerPos;
 
-        // Staffer Spawn Position
-        Location endPos = null;
-        String worldName3 = config.getString("endPos.world");
-        if (worldName3 == null) {
-            Bukkit.getLogger().severe("endPos.world doesn't exist within config.yml, could not load spawn location.");
-            return;
+        if (args.length == 1) {
+            List<String> options = new ArrayList<>();
+            options.add("start");
+            options.add("cancel");
+            options.add("setup");
+            options.add("reload");
+            return options;
         }
-        World world3 = Bukkit.getWorld(worldName);
-        if (world3 == null) {
-            Bukkit.getLogger().severe("Could not find world \"" + worldName3 + "\", could not load spawn location.");
-            return;
+        else if (args.length == 2) {
+            switch (args[0]) {
+                case "start":
+                    return playerNames;
+                case "cancel":
+                    return playerNames;
+                case "setup":
+                    List<String> setupOptions = new ArrayList<>();
+                    setupOptions.add("stafferPos");
+                    setupOptions.add("playerPos");
+                    setupOptions.add("endPos");
+                    return setupOptions;
+            }
         }
-        endPos.setWorld(world3);
-        endPos.setX(config.getDouble("endPos.x"));
-        endPos.setY(config.getDouble("endPos.y"));
-        endPos.setZ(config.getDouble("endPos.z"));
-        endPos.setYaw((float)config.getDouble("endPos.yaw"));
-        endPos.setPitch((float)config.getDouble("endPos.pitch"));
-        this.endPos = endPos;
+
+        return null;
     }
 }
