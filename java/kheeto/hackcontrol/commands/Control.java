@@ -1,8 +1,8 @@
 package kheeto.hackcontrol.commands;
 
-import kheeto.hackcontrol.util.CommandBase;
 import kheeto.hackcontrol.HackControl;
 import kheeto.hackcontrol.util.Message;
+import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -10,13 +10,16 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
 
-public class Control implements CommandExecutor, TabCompleter {
+public class Control implements CommandExecutor, TabCompleter, Listener {
     private static Control instance;
     private HackControl plugin;
     private Map<UUID, UUID> controlList; // PlayerUUID, StafferUUID
@@ -331,5 +334,22 @@ public class Control implements CommandExecutor, TabCompleter {
         }
 
         return null;
+    }
+
+    @EventHandler
+    private void onPlayerLeave(PlayerQuitEvent e) {
+        if (!plugin.getConfig().getBoolean("leaveBan.enabled")) return;
+
+        if (controlList.containsKey(e.getPlayer())) {
+            long duration = System.currentTimeMillis() + 60*60*((long) (plugin.getConfig().getDouble("leaveBan.Duration")*1000));
+            Date date = new Date(duration);
+
+            if (plugin.getConfig().getBoolean(("leaveBan.ipBan")))
+                plugin.getServer().getBanList(BanList.Type.IP).addBan(e.getPlayer().getAddress().getAddress().getHostAddress(),
+                        plugin.getConfig().getString("leaveBan.reason"), date, "HackControl");
+            else
+                plugin.getServer().getBanList(BanList.Type.NAME).addBan(e.getPlayer().getName(),
+                        plugin.getConfig().getString("leaveBan.reason"), date, "HackControl");
+        }
     }
 }
