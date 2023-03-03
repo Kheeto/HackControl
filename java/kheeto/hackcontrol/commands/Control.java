@@ -41,7 +41,7 @@ public class Control implements CommandExecutor, TabCompleter {
 
         if (args.length == 0) {
             for (String s : config.getStringList("help.control")) {
-                Message.send(sender, s);
+                Message.send(sender, s, "");
             }
             return true;
         }
@@ -49,48 +49,56 @@ public class Control implements CommandExecutor, TabCompleter {
         // Starts a new hack control
         if (args[0].equalsIgnoreCase("start")) {
             if (args.length == 1) {
-                Message.send(sender, config.getString("error.noPlayer"));
+                Message.send(sender, config.getString("errors.noPlayer"));
                 return true;
             }
 
             Player target = Bukkit.getPlayer(args[1]);
-            if (target == null) Message.send(sender, config.getString("error.noPlayerFound"));
+            if (target == null) Message.send(sender, config.getString("errors.noPlayerFound")
+                    .replace("{staffer}", sender.getName()));
 
             if (controlList.get(target) != null) {
-                Message.send(sender, config.getString("errors.alreadyControlled"));
+                Message.send(sender, config.getString("errors.alreadyControlled")
+                        .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
                 return true;
             }
 
             // Executed from console
             if (!(sender instanceof Player)) {
-                Message.send(sender, config.getString("errors.notPlayer"));
+                Message.send(sender, config.getString("errors.notPlayer")
+                        .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
                 return true;
             }
             // Executed by a player
             if (controlList.get(target.getUniqueId()) == Bukkit.getPlayer(sender.getName()).getUniqueId()) {
                 if (sender.hasPermission("hackcontrol.control.start")) {
                     controlList.put(target.getUniqueId(), ((Player) sender).getUniqueId());
-                    Message.send(sender, config.getString("control.stafferControlMessage"));
-                    Message.send(target, config.getString("control.playerControlMessage"));
+                    Message.send(sender, config.getString("control.stafferControlMessage")
+                            .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
+                    Message.send(target, config.getString("control.playerControlMessage")
+                            .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
                     StartControl(target, (Player)sender);
                     return true;
                 }
-                else Message.send(sender, config.getString("errors.noPermission"));
+                else Message.send(sender, config.getString("errors.noPermission")
+                        .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
             }
         }
 
         // Stops an hack control that is currently occurring
         else if (args[0].equalsIgnoreCase("cancel")) {
             if (args.length == 1) {
-                Message.send(sender, config.getString("error.noPlayer"));
+                Message.send(sender, config.getString("errors.noPlayer"));
                 return true;
             }
 
             Player target = Bukkit.getPlayer(args[1]);
-            if (target == null) Message.send(sender, config.getString("error.noPlayerFound"));
+            if (target == null) Message.send(sender, config.getString("errors.noPlayerFound")
+                    .replace("{staffer}", sender.getName()));
 
             if (!controlList.containsKey(target)) {
-                Message.send(sender, config.getString("errors.noControl"));
+                Message.send(sender, config.getString("errors.noControl")
+                        .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
                 return true;
             }
 
@@ -105,6 +113,8 @@ public class Control implements CommandExecutor, TabCompleter {
                     Message.send(sender, config.getString("errors.noPermission"));
                     return true;
                 }
+                Message.send(sender, config.getString("control.stafferEndMessage")
+                        .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
             }
             // Executed by another staffer
             else {
@@ -112,12 +122,15 @@ public class Control implements CommandExecutor, TabCompleter {
                     Message.send(sender, config.getString("errors.noPermission"));
                     return true;
                 }
+                Player staffer = Bukkit.getPlayer(controlList.get(target.getUniqueId()));
+                Message.send(staffer, config.getString("control.stafferEndMessageOther")
+                        .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
             }
 
             // Removes the target from the list of players in hack control
             controlList.remove(target.getUniqueId());
-            Message.send(sender, config.getString("control.stafferEndMessage"));
-            Message.send(target, config.getString("control.playerEndMessage"));
+            Message.send(target, config.getString("control.playerEndMessage")
+                    .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
             EndControl(target, (Player)sender);
             return true;
         }
@@ -125,18 +138,20 @@ public class Control implements CommandExecutor, TabCompleter {
         // Sets the spawn positions of the hack control
         else if (args[0].equalsIgnoreCase("setup")) {
             if (!sender.hasPermission("hackcontrol.control.setup")) {
-                Message.send(sender, config.getString("errors.noPermission"));
+                Message.send(sender, config.getString("errors.noPermission")
+                        .replace("{staffer}", sender.getName()));
                 return true;
             }
 
             if (!(sender instanceof Player)) {
-                Message.send(sender, config.getString("errors.notPlayer"));
+                Message.send(sender, config.getString("errors.notPlayer")
+                        .replace("{staffer}", sender.getName()));
                 return true;
             }
 
             if (args.length == 1) {
                 for (String s : config.getStringList("help.controlSetup")) {
-                    Message.send(sender, s);
+                    Message.send(sender, s, "");
                 }
                 return true;
             }
@@ -184,7 +199,7 @@ public class Control implements CommandExecutor, TabCompleter {
             }
             else {
                 for (String s : config.getStringList("help.controlSetup")) {
-                    Message.send(sender, s);
+                    Message.send(sender, s, "");
                 }
                 return true;
             }
@@ -192,17 +207,20 @@ public class Control implements CommandExecutor, TabCompleter {
 
         else if (args[0].equalsIgnoreCase("reload")) {
             if (!sender.hasPermission("hackcontrol.control.reload")) {
-                Message.send(sender, config.getString("errors.noPermission"));
+                Message.send(sender, config.getString("errors.noPermission")
+                        .replace("{staffer}", sender.getName()));
                 return true;
             }
 
             plugin.reloadConfig();
+            Message.send(sender, config.getString("configReload")
+                .replace("{staffer}", sender.getName()));
             return true;
         }
 
         else {
             for (String s : config.getStringList("help.control")) {
-                Message.send(sender, s);
+                Message.send(sender, s, "");
             }
             return true;
         }
