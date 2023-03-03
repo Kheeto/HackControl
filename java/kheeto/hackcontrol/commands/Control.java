@@ -1,19 +1,16 @@
 package kheeto.hackcontrol.commands;
 
-import jdk.javadoc.internal.tool.Start;
-import kheeto.hackcontrol.CommandBase;
+import kheeto.hackcontrol.util.CommandBase;
 import kheeto.hackcontrol.HackControl;
-import kheeto.hackcontrol.Message;
+import kheeto.hackcontrol.util.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.UUID;
 
 public class Control {
@@ -34,6 +31,11 @@ public class Control {
             public boolean onCommand(CommandSender sender, String[] args) {
                 FileConfiguration config = plugin.getConfig();
 
+                if (!sender.hasPermission("hackcontrol.control")) {
+                    Message.send(sender, config.getString("errors.noPermission"));
+                    return false;
+                }
+
                 if (args.length == 0) {
                     Message.send(sender, config.getStringList("help.control").toString());
                     return true;
@@ -43,6 +45,11 @@ public class Control {
                 if (args[0] == "start") {
                     Player target = Bukkit.getPlayer(args[1]);
                     if (target == null) Message.send(sender, config.getString("error.noPlayer"));
+
+                    if (controlList.get(target) != null) {
+                        Message.send(sender, config.getString("errors.alreadyControlled"));
+                        return false;
+                    }
 
                     // Executed from console
                     if (!(sender instanceof Player)) {
@@ -91,11 +98,17 @@ public class Control {
                     controlList.remove(target.getUniqueId());
                     Message.send(sender, config.getString("control.stafferControlMessage"));
                     Message.send(target, config.getString("control.playerControlMessage"));
+                    EndControl(target, (Player)sender);
                     return true;
                 }
 
                 // Sets the spawn positions of the hack control
                 else if (args[0] == "setup") {
+                    if (!sender.hasPermission("hackcontrol.control.setup")) {
+                        Message.send(sender, config.getString("errors.noPermission"));
+                        return false;
+                    }
+
                     if (!(sender instanceof Player)) {
                         Message.send(sender, config.getString("errors.notPlayer"));
                         return false;
@@ -173,7 +186,18 @@ public class Control {
                 staffer.teleport(stafferPos);
 
                 if(config.getBoolean("freezeDuringControl")) {
-                    // Freeze target
+                    Freeze.getInstance().FreezePlayer(target);
+                }
+            }
+
+            private void EndControl(Player target, Player staffer) {
+                FileConfiguration config = plugin.getConfig();
+
+                target.teleport(endPos);
+                staffer.teleport(endPos);
+
+                if(config.getBoolean("freezeDuringControl")) {
+                    Freeze.getInstance().UnfreezePlayer(target);
                 }
             }
         };
