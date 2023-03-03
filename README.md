@@ -5,7 +5,8 @@ Plugin spigot per i controlli hack, permette di freezare un player e metterlo in
 | ------------- |-------------|
 | /control start [player] | Mette il player in controllo hack |
 | /control cancel [player] | Termina il controllo hack se non sono stati trovati cheat |
-| /control setup [player] | Permette di settare le posizioni di spawn del controllo hack |
+| /control setup | Permette di settare le posizioni di spawn del controllo hack |
+| /control reload | Ricarica la configurazione del plugin |
 | /freeze [player] | Mette un giocatore in freeze (non può muoversi) |
 | /unfreeze [player] | Rimuove il freeze di un giocatore |
   
@@ -16,6 +17,7 @@ Plugin spigot per i controlli hack, permette di freezare un player e metterlo in
 | hackcontrol.control.cancel | Permesso di usare /control cancel |
 | hackcontrol.control.cancel.others | Permesso di usare /control cancel<br>su player controllati da altri staffer |
 | hackcontrol.control.setup | Permesso di usare /control setup |
+| hackcontrol.control.reload | Permesso di usare /control reload |
 | hackcontrol.control.bypass | Rende il player immune ai controlli hack |
 | hackcontrol.freeze.bypass | Rende il player immune allo /freeze |
 | hackcontrol.freeze | Permesso di usare /freeze |
