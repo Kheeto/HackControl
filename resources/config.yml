@@ -6,9 +6,9 @@ control:
   playerControlMessage: "&7An hack control was started on you! A staffer will check if you are using any cheats and in that case, he will ban you. &cDo not leave and listen to the instructions."
   playerEndMessage: "&7Your Hack Control was cancelled."
 freeze:
-  stafferFreezeMessage: "&7You &cfreezed &7%player%."
+  stafferFreezeMessage: "&7You &cfrozen &7%player%."
   stafferUnfreezeMessage: "&7You &aunfreezed &7%player%."
-  playerFreezeMessage: "&7You have been &cfreezed &7by a moderator."
+  playerFreezeMessage: "&7You have been &cfrozen &7by a moderator."
   playerUnfreezeMessage: "&7You have been &aunfreezed &7by a moderator."
 help:
   freeze:
@@ -24,10 +24,14 @@ help:
     - "&3/control setup endPos"
 errors:
   noPlayer: "&cYou need to specify a player!"
+  noPlayerFound: "&cThat player was not found online."
   immunePlayer: "&cThat player is immune to this command."
   noPermission: "&cYou don't have the permission to execute that command!"
   notPlayer: "&cOnly players can execute that command!"
   spawnLocations: "&cThere was an issue with loading the spawn locations.";
+  notFrozen: "&cThat player is not currently frozen."
+  alreadyFrozen: "&cThat player is already frozen!"
+  alreadyControlled: "&cThat player is already in an hack control!"
 configReload: "&aYou successfully reloaded the config."
 setup:
   stafferPos: "&aSuccessfully set the Staffer spawn position."
