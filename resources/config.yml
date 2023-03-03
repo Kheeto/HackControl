@@ -26,9 +26,9 @@ help:
     - "&8&m---------------------"
   controlSetup:
     - "&8&m----[&3 HackControl &8&m]----"
-    - "&3/control setup stafferPos"
-    - "&3/control setup playerPos"
-    - "&3/control setup endPos"
+    - "&7/control setup stafferPos"
+    - "&7/control setup playerPos"
+    - "&7/control setup endPos"
     - "&8&m---------------------"
 errors:
   noPlayer: "&cYou need to specify a player."
@@ -40,7 +40,8 @@ errors:
   notFrozen: "&4{player} &cis not currently frozen."
   alreadyFrozen: "&4{player} &cis already frozen!"
   alreadyControlled: "&4{player} &cis already in an hack control."
-  noControl: "&cThere is currently no hack control on 4{player}&c."
+  noControl: "&cThere is currently no hack control on &4{player}&c."
+  yourself: "&cYou cannot start an hack control on yourself."
 configReload: "&aYou successfully reloaded the config."
 setup:
   stafferPos: "&eYou set the Staffer spawn position."
