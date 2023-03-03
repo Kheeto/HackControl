@@ -51,7 +51,7 @@ public class Freeze implements CommandExecutor, Listener, TabCompleter {
         Player p = Bukkit.getPlayer(args[0]);
         if (p == null) {
             Message.send(sender, config.getString("errors.noPlayerFound")
-                    .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
+                    .replace("{player}", args[0]).replace("{staffer}", sender.getName()));
             return true;
         }
 
