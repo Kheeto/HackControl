@@ -19,77 +19,95 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.UUID;
 
-public class Freeze implements CommandExecutor, Listener {
+public class Freeze implements Listener {
 
     private static Freeze instance;
     private HackControl plugin;
     private static List<Player> frozenPlayers;
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        FileConfiguration config = HackControl.getInstance().getConfig();
+    public Freeze(HackControl plugin) {
+        instance = this;
+        this.plugin = plugin;
 
-        if (command.getName() == "freeze") {
-            if (!sender.hasPermission("hackcontrol.freeze")) {
-                Message.send(sender, config.getString("errors.noPermission"));
-                return false;
+        new CommandBase("freeze", false) {
+            @Override
+            public boolean onCommand(CommandSender sender, String[] args) {
+                FileConfiguration config = HackControl.getInstance().getConfig();
+
+                if (!sender.hasPermission("hackcontrol.freeze")) {
+                    Message.send(sender, config.getString("errors.noPermission"));
+                    return false;
+                }
+
+                if (args.length == 0) {
+                    Message.send(sender, config.getString("errors.noPlayer"));
+                    return false;
+                }
+
+                Player p = Bukkit.getPlayer(args[1]);
+                if (p == null) {
+                    Message.send(sender, config.getString("errors.noPlayerFound"));
+                    return false;
+                }
+
+                if (p.hasPermission("hackcontrol.freeze.bypass")) {
+                    Message.send(sender, config.getString("errors.immunePlayer"));
+                    return false;
+                }
+
+                if (frozenPlayers.contains(p)) {
+                    Message.send(sender, config.getString("errors.alreadyFrozen"));
+                    return false;
+                }
+
+                frozenPlayers.add(p);
+                sender.sendMessage(config.getString("stafferFreezeMessage"));
+                p.sendMessage(config.getString("playerFreezeMessage"));
+                return true;
             }
 
-            if (args.length == 0) {
-                Message.send(sender, config.getString("errors.noPlayer"));
-                return false;
+            @Override
+            public String getUsage() {
+                return "/freeze";
+            }
+        };
+        new CommandBase("unfreeze", false) {
+            @Override
+            public boolean onCommand(CommandSender sender, String[] args) {
+                FileConfiguration config = HackControl.getInstance().getConfig();
+
+                if (!sender.hasPermission("hackcontrol.unfreeze")) {
+                    Message.send(sender, config.getString("errors.noPermission"));
+                    return false;
+                }
+
+                if (args.length == 0) {
+                    Message.send(sender, config.getString("errors.noPlayer"));
+                    return false;
+                }
+
+                Player p = Bukkit.getPlayer(args[1]);
+                if (p == null) {
+                    Message.send(sender, config.getString("errors.noPlayerFound"));
+                    return false;
+                }
+
+                if (!frozenPlayers.contains(p)) {
+                    Message.send(sender, config.getString("errors.notFrozen"));
+                    return false;
+                }
+
+                frozenPlayers.remove(p);
+                sender.sendMessage(config.getString("stafferUnfreezeMessage"));
+                p.sendMessage(config.getString("playerUnfreezeMessage"));
+                return true;
             }
 
-            Player p = Bukkit.getPlayer(args[1]);
-            if (p == null) {
-                Message.send(sender, config.getString("errors.noPlayerFound"));
-                return false;
+            @Override
+            public String getUsage() {
+                return "/unfreeze";
             }
-
-            if (p.hasPermission("hackcontrol.freeze.bypass")) {
-                Message.send(sender, config.getString("errors.immunePlayer"));
-                return false;
-            }
-
-            if (frozenPlayers.contains(p)) {
-                Message.send(sender, config.getString("errors.alreadyFrozen"));
-                return false;
-            }
-
-            frozenPlayers.add(p);
-            sender.sendMessage(config.getString("stafferFreezeMessage"));
-            p.sendMessage(config.getString("playerFreezeMessage"));
-            return true;
-        }
-        else if (command.getName() == "unfreeze") {
-            if (!sender.hasPermission("hackcontrol.unfreeze")) {
-                Message.send(sender, config.getString("errors.noPermission"));
-                return false;
-            }
-
-            if (args.length == 0) {
-                Message.send(sender, config.getString("errors.noPlayer"));
-                return false;
-            }
-
-            Player p = Bukkit.getPlayer(args[1]);
-            if (p == null) {
-                Message.send(sender, config.getString("errors.noPlayerFound"));
-                return false;
-            }
-
-            if (!frozenPlayers.contains(p)) {
-                Message.send(sender, config.getString("errors.notFrozen"));
-                return false;
-            }
-
-            frozenPlayers.remove(p);
-            sender.sendMessage(config.getString("stafferUnfreezeMessage"));
-            p.sendMessage(config.getString("playerUnfreezeMessage"));
-            return true;
-        }
-
-        return false;
+        };
     }
 
     @EventHandler
