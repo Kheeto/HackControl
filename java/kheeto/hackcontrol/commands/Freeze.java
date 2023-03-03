@@ -16,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class Freeze implements CommandExecutor, Listener, TabCompleter {
@@ -27,7 +28,8 @@ public class Freeze implements CommandExecutor, Listener, TabCompleter {
     public Freeze(HackControl plugin) {
         instance = this;
         this.plugin = plugin;
-        frozenPlayers = Arrays.asList();
+        List<Player> list = Arrays.asList();
+        frozenPlayers = new ArrayList<>(list);
     }
 
     @Override
@@ -35,58 +37,72 @@ public class Freeze implements CommandExecutor, Listener, TabCompleter {
         FileConfiguration config = HackControl.getInstance().getConfig();
 
         if (!sender.hasPermission("hackcontrol.freeze")) {
-            Message.send(sender, config.getString("errors.noPermission"));
+            Message.send(sender, config.getString("errors.noPermission")
+                    .replace("{staffer}", sender.getName()));
             return true;
         }
 
         if (args.length == 0) {
-            Message.send(sender, config.getString("errors.noPlayer"));
+            Message.send(sender, config.getString("errors.noPlayer")
+                    .replace("{staffer}", sender.getName()));
             return true;
         }
 
         Player p = Bukkit.getPlayer(args[0]);
         if (p == null) {
-            Message.send(sender, config.getString("errors.noPlayerFound"));
+            Message.send(sender, config.getString("errors.noPlayerFound")
+                    .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
             return true;
         }
 
         if (p.hasPermission("hackcontrol.freeze.bypass")) {
-            Message.send(sender, config.getString("errors.immunePlayer"));
+            Message.send(sender, config.getString("errors.immunePlayer")
+                    .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
             return true;
         }
 
         if (args.length == 1) {
             if (frozenPlayers.contains(p)) {
                 frozenPlayers.remove(p);
-                sender.sendMessage(config.getString("stafferUnfreezeMessage"));
-                p.sendMessage(config.getString("playerUnfreezeMessage"));
+                Message.send(sender, config.getString("freeze.stafferUnfreezeMessage")
+                        .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
+                Message.send(p, config.getString("freeze.playerUnfreezeMessage")
+                        .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
                 return true;
             } else if (!frozenPlayers.contains(p)) {
                 frozenPlayers.add(p);
-                sender.sendMessage(config.getString("stafferFreezeMessage"));
-                p.sendMessage(config.getString("playerFreezeMessage"));
+                Message.send(sender, config.getString("freeze.stafferFreezeMessage")
+                        .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
+                Message.send(p, config.getString("freeze.playerFreezeMessage")
+                        .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
                 return true;
             }
         } else if (args.length > 1) {
             if (Boolean.parseBoolean(args[1])) {
                 if (frozenPlayers.contains(p)) {
-                    Message.send(sender, config.getString("errors.alreadyFrozen"));
+                    Message.send(sender, config.getString("errors.alreadyFrozen")
+                            .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
                     return true;
                 }
 
                 frozenPlayers.add(p);
-                sender.sendMessage(config.getString("stafferFreezeMessage"));
-                p.sendMessage(config.getString("playerFreezeMessage"));
+                Message.send(sender, config.getString("freeze.stafferFreezeMessage")
+                        .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
+                Message.send(p, config.getString("freeze.playerFreezeMessage")
+                        .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
                 return true;
             } else {
                 if (!frozenPlayers.contains(p)) {
-                    Message.send(sender, config.getString("errors.notFrozen"));
+                    Message.send(sender, config.getString("errors.notFrozen")
+                            .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
                     return true;
                 }
 
                 frozenPlayers.remove(p);
-                sender.sendMessage(config.getString("stafferUnfreezeMessage"));
-                p.sendMessage(config.getString("playerUnfreezeMessage"));
+                Message.send(sender, config.getString("freeze.stafferUnfreezeMessage")
+                        .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
+                Message.send(p, config.getString("freeze.playerUnfreezeMessage")
+                        .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
                 return true;
             }
         }
