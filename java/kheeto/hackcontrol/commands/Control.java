@@ -54,8 +54,11 @@ public class Control implements CommandExecutor, TabCompleter {
             }
 
             Player target = Bukkit.getPlayer(args[1]);
-            if (target == null) Message.send(sender, config.getString("errors.noPlayerFound")
-                    .replace("{staffer}", sender.getName()));
+            if (target == null) {
+                Message.send(sender, config.getString("errors.noPlayerFound")
+                        .replace("{player}", args[1]).replace("{staffer}", sender.getName()));
+                return true;
+            }
 
             if (controlList.get(target) != null) {
                 Message.send(sender, config.getString("errors.alreadyControlled")
@@ -69,19 +72,27 @@ public class Control implements CommandExecutor, TabCompleter {
                         .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
                 return true;
             }
-            // Executed by a player
-            if (controlList.get(target.getUniqueId()) == Bukkit.getPlayer(sender.getName()).getUniqueId()) {
-                if (sender.hasPermission("hackcontrol.control.start")) {
-                    controlList.put(target.getUniqueId(), ((Player) sender).getUniqueId());
-                    Message.send(sender, config.getString("control.stafferControlMessage")
-                            .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
-                    Message.send(target, config.getString("control.playerControlMessage")
-                            .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
-                    StartControl(target, (Player)sender);
-                    return true;
-                }
-                else Message.send(sender, config.getString("errors.noPermission")
+
+            // Player trying to hack control himself
+            if (target.getName() == sender.getName()) {
+                Message.send(sender, config.getString("errors.yourself")
                         .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
+                return true;
+            }
+
+            if (sender.hasPermission("hackcontrol.control.start")) {
+                controlList.put(target.getUniqueId(), ((Player) sender).getUniqueId());
+                Message.send(sender, config.getString("control.stafferControlMessage")
+                        .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
+                Message.send(target, config.getString("control.playerControlMessage")
+                        .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
+                StartControl(target, (Player)sender);
+                return true;
+            }
+            else {
+                Message.send(sender, config.getString("errors.noPermission")
+                        .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
+                return true;
             }
         }
 
@@ -93,8 +104,11 @@ public class Control implements CommandExecutor, TabCompleter {
             }
 
             Player target = Bukkit.getPlayer(args[1]);
-            if (target == null) Message.send(sender, config.getString("errors.noPlayerFound")
-                    .replace("{staffer}", sender.getName()));
+            if (target == null) {
+                Message.send(sender, config.getString("errors.noPlayerFound")
+                        .replace("{player}", args[1]).replace("{staffer}", sender.getName()));
+                return true;
+            }
 
             if (!controlList.containsKey(target)) {
                 Message.send(sender, config.getString("errors.noControl")
@@ -158,7 +172,7 @@ public class Control implements CommandExecutor, TabCompleter {
             Player p = (Player)sender;
             Location loc = p.getLocation();
 
-            if (args[1] == "stafferPos") {
+            if (args[1].equalsIgnoreCase("stafferPos")) {
                 config.set("stafferPos.world", loc.getWorld().getName());
                 config.set("stafferPos.x", loc.getBlockX());
                 config.set("stafferPos.y", loc.getBlockY());
@@ -171,7 +185,7 @@ public class Control implements CommandExecutor, TabCompleter {
                 Message.send(sender, config.getString("setup.stafferPos"));
                 return true;
             }
-            else if (args[1] == "playerPos") {
+            else if (args[1].equalsIgnoreCase("playerPos")) {
                 config.set("playerPos.world", loc.getWorld().getName());
                 config.set("playerPos.x", loc.getBlockX());
                 config.set("playerPos.y", loc.getBlockY());
@@ -184,7 +198,7 @@ public class Control implements CommandExecutor, TabCompleter {
                 Message.send(sender, config.getString("setup.playerPos"));
                 return true;
             }
-            else if (args[1] == "endPos") {
+            else if (args[1].equalsIgnoreCase("endPos")) {
                 config.set("endPos.world", loc.getWorld().getName());
                 config.set("endPos.x", loc.getBlockX());
                 config.set("endPos.y", loc.getBlockY());
@@ -224,8 +238,6 @@ public class Control implements CommandExecutor, TabCompleter {
             }
             return true;
         }
-
-        return false;
     }
 
     private void StartControl(Player target, Player staffer) {
