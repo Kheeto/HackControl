@@ -40,6 +40,7 @@ errors:
   notFrozen: "&4{player} &cis not currently frozen."
   alreadyFrozen: "&4{player} &cis already frozen!"
   alreadyControlled: "&4{player} &cis already in an hack control."
+  alreadyControlling: "&cYou are already controlling another player."
   noControl: "&cThere is currently no hack control on &4{player}&c."
   yourself: "&cYou cannot start an hack control on yourself."
 configReload: "&aYou successfully reloaded the config."
