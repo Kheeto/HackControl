@@ -14,6 +14,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -350,6 +351,41 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
             else
                 plugin.getServer().getBanList(BanList.Type.NAME).addBan(e.getPlayer().getName(),
                         plugin.getConfig().getString("leaveBan.reason"), date, "HackControl");
+        }
+    }
+
+    @EventHandler
+    private void onPlayerChat(AsyncPlayerChatEvent e) {
+        FileConfiguration config = plugin.getConfig();
+        Player sender = e.getPlayer();
+
+        if (controlList.containsKey(sender.getUniqueId())) { // if a controlled player writes a message
+            Player staffer = Bukkit.getPlayer(controlList.get(sender));
+
+            Message.send(sender, config.getString("controlChannel.playerPrefix")
+                    .replace("{player}", sender.getName())
+                    .replace("{staffer}", staffer.getName())+ e.getMessage());
+            Message.send(staffer, config.getString("controlChannel.playerPrefix")
+                    .replace("{player}", sender.getName())
+                    .replace("{staffer}", staffer.getName()) + e.getMessage());
+            e.setCancelled(true);
+        }
+        else if (controlList.containsValue(sender)) { // if a staffer in hack control writes a message
+            Player player = null;
+            // find the player he is controlling
+            for (UUID u : controlList.keySet()) {
+                if (controlList.get(u) == sender.getUniqueId())
+                    player = Bukkit.getPlayer(u);
+            }
+            if (player == null) return;
+
+            Message.send(player, config.getString("controlChannel.stafferPrefix")
+                    .replace("{staffer}", sender.getName())
+                    .replace("{player}", player.getName())+ e.getMessage());
+            Message.send(sender, config.getString("controlChannel.stafferPrefix")
+                    .replace("{staffer}", sender.getName())
+                    .replace("{player}", player.getName())+ e.getMessage());
+            e.setCancelled(true);
         }
     }
 }
