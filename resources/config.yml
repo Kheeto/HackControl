@@ -47,6 +47,9 @@ setup:
   stafferPos: "&eYou set the Staffer spawn position."
   playerPos: "&eYou set the Player spawn position."
   endPos: "&eYou set the end position."
+controlChannel:
+  stafferPrefix: "&8[&3HackControl&8] &7{staffer} &8» &r"
+  playerPrefix: "&8[&3HackControl&8] &7{player} &8» &r"
 
 # Should the player be automatically freezed in an hack control? (cannot move)
 freezeDuringControl: false
