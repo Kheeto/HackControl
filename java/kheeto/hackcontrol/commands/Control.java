@@ -84,6 +84,12 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
                 return true;
             }
 
+            if (controlList.values().contains(((Player) sender).getUniqueId())) {
+                Message.send(sender, config.getString("errors.alreadyControlling")
+                        .replace("{staffer}", sender.getName()).replace("{player}", target.getName()));
+                return true;
+            }
+
             if (sender.hasPermission("hackcontrol.control.start")) {
                 controlList.put(target.getUniqueId(), ((Player) sender).getUniqueId());
                 Message.send(sender, config.getString("control.stafferControlMessage")
