@@ -3,3 +3,8 @@ version: ${project.version}
 main: kheeto.hackcontrol.HackControl
 api-version: 1.19
 authors: [ Kheeto67 ]
+commands:
+  control:
+    usage: /control
+  freeze:
+    usage: /freeze
