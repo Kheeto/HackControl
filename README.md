@@ -1,12 +1,10 @@
 # HackControl
-Plugin bungee per i controlli hack, mentre il server spigot dei controlli avrà un plugin interno, separato.
+Bungeecord version of the plugin, it simply moves the player and the staffer to another server, where hack controls are executed
 
-### (Nuova configurazione)
-
-| Comandi    | Descrizione |
+| Commands    | Description |
 | ------------- |-------------|
-| /control [player] | Sposta lo staff e il player nel server dei controlli |
+| /control [player] | Sends the target and staffer to the hack control server |
   
-| Permessi    | Descrizione |
+| Permissions    | Description |
 | ------------- |-------------|
-| hackcontrol.control | Permesso di usare /control, verrà dato solo<br>agli staff che fanno i controlli |
+| hackcontrol.control | Gives access to /control |
