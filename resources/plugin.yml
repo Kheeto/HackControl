@@ -2,9 +2,11 @@ name: HackControl
 version: ${project.version}
 main: kheeto.hackcontrol.HackControl
 api-version: 1.19
-authors: [ Kheeto67 ]
+prefix: [ HackControl ]
+authors: [ Kheeto ]
+website: https://github.com/Endless-Development/HackControl
 commands:
   control:
-    usage: /control
+    usage: /<command>
   freeze:
-    usage: /freeze
+    usage: /<command>
