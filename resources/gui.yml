@@ -1,0 +1,65 @@
+# GUI shown to the target at the start of the hack control
+# He can choose to admit he was hacking and get banned,
+# refuse the hack control and get banned, or allow the hack control
+player:
+  # If disabled, the player will automatically accept the hack control
+  enabled: true
+  title: "&8Hack Control"
+  rows: 3
+  items:
+    - accept:
+        enabled: true
+        name: "&a&lAccept the Hack Control"
+        lore:
+          - "&7The staffer will check"
+          - "&7if you are cheating."
+        material: LIME_CONCRETE
+        slot: 10
+    - admit:
+        enabled: true
+        name: "&e&lAdmit you were cheating"
+        lore:
+          - "&7You will get banned but for"
+          - "&7a shorter amount of time"
+        material: YELLOW_STAINED_GLASS
+        slot: 13
+    - refuse:
+        enabled: true
+        name: "&c&lRefuse the hack control"
+        lore:
+          - "&7You will get banned for not"
+          - "&7allowing the hack control"
+        material: RED_CONCRETE
+        slot: 16
+
+# GUI shown to the staffer when he ends the hack control
+staffer:
+  # If disabled, the /control end command will end it assuming the player should not be banned
+  enabled: true
+  title: "&8Hack Control"
+  rows: 3
+  items:
+    - release:
+        enabled: true
+        name: "&a&lPlayer was not cheating"
+        lore:
+          - "&7The hack control will end,"
+          - "&7without banning the player."
+        material: LIME_CONCRETE
+        slot: 10
+    - ban:
+        enabled: true
+        name: "&c&lBan the player"
+        lore:
+          - "&7The player will be banned"
+          - "&7for a default duration of &3{duration}"
+        material: RED_CONCRETE
+        slot: 13
+    - customBan:
+        enabled: true
+        name: "&e&lEnter a Ban Duration"
+        lore:
+          - "&7You can choose how long"
+          - "&7the ban will last."
+        material: NAME_TAG
+        slot: 16
