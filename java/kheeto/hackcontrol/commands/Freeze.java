@@ -2,6 +2,7 @@ package kheeto.hackcontrol.commands;
 
 import kheeto.hackcontrol.HackControl;
 import kheeto.hackcontrol.util.Message;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -22,6 +23,7 @@ import java.util.*;
 
 public class Freeze implements CommandExecutor, Listener, TabCompleter {
 
+    @Getter
     private static Freeze instance;
     private HackControl plugin;
     private static List<Player> frozenPlayers;
@@ -146,10 +148,6 @@ public class Freeze implements CommandExecutor, Listener, TabCompleter {
             e.setCancelled(true);
         if (frozenPlayers.contains(e.getEntity()))
             e.setCancelled(true);
-    }
-
-    public static Freeze getInstance() {
-        return instance;
     }
 
     public void FreezePlayer(Player p) {
