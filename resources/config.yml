@@ -60,7 +60,14 @@ leaveBan:
   ipBan: false
   # Enter the time in hours! (can be decimal)
   duration: 168
-  reason: "You left during an hack control"
+  reason: "§cYou left during an hack control"
+# Ban duration for players who admit they are cheating
+# You can disable this in gui.yml
+admitBan:
+  ipBan: false
+  # Enter the time in hours! (can be decimal)
+  duration: 168
+  reason: "§cCheating through the use of unfair advantages"
 
 # Spawn Positions
 # You can edit these with /control setup
