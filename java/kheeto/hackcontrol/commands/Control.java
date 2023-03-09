@@ -2,6 +2,8 @@ package kheeto.hackcontrol.commands;
 
 import kheeto.hackcontrol.HackControl;
 import kheeto.hackcontrol.gui.GUIConfig;
+import kheeto.hackcontrol.guis.PlayerGUI;
+import kheeto.hackcontrol.guis.StafferGUI;
 import kheeto.hackcontrol.util.Message;
 import lombok.Getter;
 import org.bukkit.BanList;
@@ -27,6 +29,7 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
     @Getter
     private static Control instance;
     private HackControl plugin;
+    @Getter
     private Map<UUID, UUID> controlList; // PlayerUUID, StafferUUID
 
     private Location playerPos = null;
@@ -94,24 +97,24 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
                 return true;
             }
 
-            if (sender.hasPermission("hackcontrol.control.start")) {
-                controlList.put(target.getUniqueId(), ((Player) sender).getUniqueId());
-                Message.send(sender, config.getString("control.stafferControlMessage")
-                        .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
-                Message.send(target, config.getString("control.playerControlMessage")
-                        .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
-                StartControl(target, (Player)sender);
-                return true;
-            }
-            else {
+            if (!sender.hasPermission("hackcontrol.control.start")) {
                 Message.send(sender, config.getString("errors.noPermission")
                         .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
                 return true;
             }
+
+            controlList.put(target.getUniqueId(), ((Player) sender).getUniqueId());
+            Message.send(sender, config.getString("control.stafferControlMessage")
+                    .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
+            Message.send(target, config.getString("control.playerControlMessage")
+                    .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
+            StartControl(target, (Player)sender);
+            PlayerGUI.show(target);
+            return true;
         }
 
         // Stops an hack control that is currently occurring
-        else if (args[0].equalsIgnoreCase("cancel")) {
+        else if (args[0].equalsIgnoreCase("end")) {
             if (args.length == 1) {
                 Message.send(sender, config.getString("errors.noPlayer"));
                 return true;
@@ -135,31 +138,8 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
                 controlList.remove(target.getUniqueId());
                 return true;
             }
-            // Executed by the same staffer who is controlling the player
-            if (controlList.get(target.getUniqueId()) == Bukkit.getPlayer(sender.getName()).getUniqueId()) {
-                if (!sender.hasPermission("hackcontrol.control.cancel")) {
-                    Message.send(sender, config.getString("errors.noPermission"));
-                    return true;
-                }
-                Message.send(sender, config.getString("control.stafferEndMessage")
-                        .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
-            }
-            // Executed by another staffer
-            else {
-                if (!sender.hasPermission("hackcontrol.control.cancel.others")) {
-                    Message.send(sender, config.getString("errors.noPermission"));
-                    return true;
-                }
-                Player staffer = Bukkit.getPlayer(controlList.get(target.getUniqueId()));
-                Message.send(staffer, config.getString("control.stafferEndMessageOther")
-                        .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
-            }
 
-            // Removes the target from the list of players in hack control
-            controlList.remove(target.getUniqueId());
-            Message.send(target, config.getString("control.playerEndMessage")
-                    .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
-            EndControl(target, (Player)sender);
+            StafferGUI.show((Player)sender, target);
             return true;
         }
 
@@ -264,9 +244,14 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
         if(config.getBoolean("freezeDuringControl")) {
             Freeze.getInstance().FreezePlayer(target);
         }
+
+        PlayerGUI.show(target);
     }
 
-    private void EndControl(Player target, Player staffer) {
+    public void EndControl(Player target, Player staffer) {
+        if (controlList.containsKey(target))
+            controlList.remove(target);
+
         FileConfiguration config = plugin.getConfig();
 
         target.teleport(endPos);
@@ -316,7 +301,7 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
         if (args.length == 1) {
             List<String> options = new ArrayList<>();
             options.add("start");
-            options.add("cancel");
+            options.add("end");
             options.add("setup");
             options.add("reload");
             return options;
@@ -325,7 +310,7 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
             switch (args[0]) {
                 case "start":
                     return playerNames;
-                case "cancel":
+                case "end":
                     if (controlList == null) return playerNames;
                     List<String> controlledPlayers = new ArrayList<>();
                     for (UUID u : controlList.keySet()) {
