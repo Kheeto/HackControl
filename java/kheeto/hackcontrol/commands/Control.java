@@ -1,7 +1,9 @@
 package kheeto.hackcontrol.commands;
 
 import kheeto.hackcontrol.HackControl;
+import kheeto.hackcontrol.gui.GUIConfig;
 import kheeto.hackcontrol.util.Message;
+import lombok.Getter;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -21,6 +23,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.*;
 
 public class Control implements CommandExecutor, TabCompleter, Listener {
+
+    @Getter
     private static Control instance;
     private HackControl plugin;
     private Map<UUID, UUID> controlList; // PlayerUUID, StafferUUID
@@ -237,6 +241,7 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
             }
 
             plugin.reloadConfig();
+            GUIConfig.reload();
             Message.send(sender, config.getString("configReload")
                 .replace("{staffer}", sender.getName()));
             return true;
@@ -270,10 +275,6 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
         if(config.getBoolean("freezeDuringControl")) {
             Freeze.getInstance().UnfreezePlayer(target);
         }
-    }
-
-    public Control getInstance() {
-        return instance;
     }
 
     public void LoadLocations() {
@@ -348,7 +349,7 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
         if (!plugin.getConfig().getBoolean("leaveBan.enabled")) return;
 
         if (controlList.containsKey(e.getPlayer())) {
-            long duration = System.currentTimeMillis() + 60*60*((long) (plugin.getConfig().getDouble("leaveBan.Duration")*1000));
+            long duration = System.currentTimeMillis() + 60*60*((long) (plugin.getConfig().getDouble("leaveBan.duration")*1000));
             Date date = new Date(duration);
 
             if (plugin.getConfig().getBoolean(("leaveBan.ipBan")))
