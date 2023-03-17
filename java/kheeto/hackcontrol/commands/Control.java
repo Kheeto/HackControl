@@ -109,7 +109,7 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
             Message.send(target, config.getString("control.playerControlMessage")
                     .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
             StartControl(target, (Player)sender);
-            PlayerGUI.show(target);
+            //PlayerGUI.show(target);
             return true;
         }
 
@@ -127,7 +127,7 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
                 return true;
             }
 
-            if (!controlList.containsKey(target)) {
+            if (!controlList.containsKey(target.getUniqueId())) {
                 Message.send(sender, config.getString("errors.noControl")
                         .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
                 return true;
@@ -136,10 +136,39 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
             // Executed from console
             if (!(sender instanceof Player)) {
                 controlList.remove(target.getUniqueId());
+                Message.send(sender, config.getString("stafferEndMessage")
+                        .replace("{player}", target.getName()));
+                EndControl(target, Bukkit.getPlayer(controlList.get(target.getUniqueId())));
                 return true;
             }
 
-            StafferGUI.show((Player)sender, target);
+            Player staffer = Bukkit.getPlayer(controlList.get(target.getUniqueId()));
+
+            // Executed by the same staffer who is controlling the player
+            if (staffer.equals((Player)sender)) {
+                if (!sender.hasPermission("hackcontrol.control.end")) {
+                    Message.send(sender, config.getString("errors.noPermission"));
+                    return true;
+                }
+                Message.send(sender, config.getString("control.stafferEndMessage")
+                        .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
+            }
+            // Executed by another staffer
+            else {
+                if (!sender.hasPermission("hackcontrol.control.end.others")) {
+                    Message.send(sender, config.getString("errors.noPermission"));
+                    return true;
+                }
+                Message.send(staffer, config.getString("control.stafferBanMessageOther")
+                        .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
+                Message.send(sender, config.getString("control.stafferEndMessage")
+                        .replace("{player}", target.getName()));
+            }
+
+            controlList.remove(target.getUniqueId());
+            EndControl(target, staffer);
+            Message.send(target, config.getString("control.playerEndMessage"));
+            //StafferGUI.show((Player)sender, target);
             return true;
         }
 
@@ -244,8 +273,6 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
         if(config.getBoolean("freezeDuringControl")) {
             Freeze.getInstance().FreezePlayer(target);
         }
-
-        PlayerGUI.show(target);
     }
 
     public void EndControl(Player target, Player staffer) {
@@ -263,30 +290,32 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
     }
 
     public void LoadLocations() {
-        LoadLocation(stafferPos, "stafferPos");
-        LoadLocation(playerPos, "playerPos");
-        LoadLocation(endPos, "endPos");
+        stafferPos = LoadLocation("stafferPos");
+        playerPos = LoadLocation("playerPos");
+        endPos = LoadLocation("endPos");
     }
 
-    private void LoadLocation(Location location, String name) {
+    private Location LoadLocation(String name) {
         FileConfiguration config = plugin.getConfig();
 
         String worldName = config.getString(name + ".world");
         if (worldName == null) {
             Bukkit.getLogger().severe(name + ".world doesn't exist within config.yml, could not load spawn location.");
-            return;
+            return null;
         }
         World world = Bukkit.getWorld(worldName);
         if (world == null) {
             Bukkit.getLogger().severe("Could not find world \"" + worldName + "\", could not load spawn location.");
-            return;
+            return null;
         }
         int x = config.getInt(name + ".x");
         int y = config.getInt(name + ".y");
         int z = config.getInt(name + ".z");
         float yaw = (float)config.getDouble(name + ".yaw");
         float pitch = (float)config.getDouble(name + ".pitch");
-        this.stafferPos = new Location(world, x, y, z, yaw, pitch);
+
+        plugin.getLogger().info("Successfully loaded location \""+name+"\".");
+        return new Location(world, x, y, z, yaw, pitch);
     }
 
     @Override
