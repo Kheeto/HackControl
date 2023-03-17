@@ -20,7 +20,7 @@ help:
   control:
     - "&8&m----[&3 HackControl &8&m]----"
     - "&7/control start <player>"
-    - "&7/control cancel <player>"
+    - "&7/control end <player>"
     - "&7/control setup <options>"
     - "&7/control reload"
     - "&8&m---------------------"
@@ -40,7 +40,7 @@ errors:
   notFrozen: "&4{player} &cis not currently frozen."
   alreadyFrozen: "&4{player} &cis already frozen!"
   alreadyControlled: "&4{player} &cis already in an hack control."
-  alreadyControlling: "&cYou are already controlling another player."
+  alreadyControlling: "&cYou are already controlling a player."
   noControl: "&cThere is currently no hack control on &4{player}&c."
   yourself: "&cYou cannot start an hack control on yourself."
 configReload: "&aYou successfully reloaded the config."
@@ -64,6 +64,20 @@ leaveBan:
 # Ban duration for players who admit they are cheating
 # You can disable this in gui.yml
 admitBan:
+  ipBan: false
+  # Enter the time in hours! (can be decimal)
+  duration: 168
+  reason: "§cCheating through the use of unfair advantages"
+# Ban duration for players who refuse an hack control
+# You can disable this in gui.yml
+refuseBan:
+  ipBan: false
+  # Enter the time in hours! (can be decimal)
+  duration: 168
+  reason: "§cYou refused an hack control"
+# Ban duration for when the staffer found out the player was cheating
+# You can disable this in gui.yml
+cheatingBan:
   ipBan: false
   # Enter the time in hours! (can be decimal)
   duration: 168
