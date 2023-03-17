@@ -1,5 +1,6 @@
 package kheeto.hackcontrol.gui;
 
+import kheeto.hackcontrol.HackControl;
 import kheeto.hackcontrol.data.PlayerData;
 import kheeto.hackcontrol.data.PlayerDataManager;
 import org.bukkit.entity.Player;
@@ -8,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class GUIListener implements Listener {
 
@@ -31,7 +33,14 @@ public class GUIListener implements Listener {
         if (data == null || data.getCurrentGUI() == null) return;
 
         if (!data.getCurrentGUI().isCloseable()) {
-            data.getCurrentGUI().show((Player)e.getPlayer());
+            new BukkitRunnable(){
+                @Override
+                public void run(){
+                    e.getPlayer().openInventory(e.getInventory());
+                }
+            }.runTaskLater(HackControl.getInstance(),  10);
         }
+        else
+            data.setCurrentGUI(null);
     }
 }
