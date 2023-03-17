@@ -2,6 +2,7 @@ package kheeto.hackcontrol.guis;
 
 import kheeto.hackcontrol.HackControl;
 import kheeto.hackcontrol.commands.Control;
+import kheeto.hackcontrol.data.PlayerDataManager;
 import kheeto.hackcontrol.gui.GUI;
 import kheeto.hackcontrol.gui.GUIButton;
 import kheeto.hackcontrol.gui.GUIConfig;
@@ -26,13 +27,14 @@ public class StafferGUI {
 
         // No cheats found
         ItemStack release = new ItemStack(
-                Material.getMaterial(guiConfig.getString("staffer.items.release.material")));
+                Material.matchMaterial(guiConfig.getString("staffer.items.release.material",
+                        "LIME_CONCRETE")));
         ItemMeta releaseMeta = release.getItemMeta();
         releaseMeta.setDisplayName(guiConfig.getString("staffer.items.release.name"));
         releaseMeta.setLore(guiConfig.getStringList("staffer.items.release.lore"));
         release.setItemMeta(releaseMeta);
-        GUIButton acceptButton = new GUIButton(release);
-        acceptButton.setAction(() -> {
+        GUIButton releaseButton = new GUIButton(release);
+        releaseButton.setAction(() -> {
             sender.closeInventory();
 
             // Executed by the same staffer who is controlling the player
@@ -60,17 +62,20 @@ public class StafferGUI {
                     .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
 
             control.EndControl(target, sender);
+            PlayerDataManager.getData(target).setCurrentGUI(null);
+            target.closeInventory();
         });
 
         // Ban button
-        ItemStack admit = new ItemStack(
-                Material.getMaterial(guiConfig.getString("staffer.items.ban.material")));
-        ItemMeta admitMeta = admit.getItemMeta();
-        admitMeta.setDisplayName(guiConfig.getString("staffer.items.ban.name"));
-        admitMeta.setLore(guiConfig.getStringList("staffer.items.ban.lore"));
-        admit.setItemMeta(admitMeta);
-        GUIButton admitButton = new GUIButton(admit);
-        admitButton.setAction(() -> {
+        ItemStack ban = new ItemStack(
+                Material.matchMaterial(guiConfig.getString("staffer.items.ban.material",
+                        "RED_CONCRETE")));
+        ItemMeta banMeta = ban.getItemMeta();
+        banMeta.setDisplayName(guiConfig.getString("staffer.items.ban.name"));
+        banMeta.setLore(guiConfig.getStringList("staffer.items.ban.lore"));
+        ban.setItemMeta(banMeta);
+        GUIButton banButton = new GUIButton(ban);
+        banButton.setAction(() -> {
             sender.closeInventory();
 
             // Executed by the same staffer who is controlling the player
@@ -94,6 +99,9 @@ public class StafferGUI {
             }
 
             control.EndControl(target, sender);
+            PlayerDataManager.getData(target).setCurrentGUI(null);
+            target.closeInventory();
+
             long duration = System.currentTimeMillis() + 60 * 60 * ((long) config.getDouble("cheatingBan.duration") * 1000);
             Date date = new Date(duration);
 
@@ -104,5 +112,12 @@ public class StafferGUI {
                 plugin.getServer().getBanList(BanList.Type.NAME).addBan(target.getName(),
                         plugin.getConfig().getString("cheatingBan.reason"), date, "HackControl");
         });
+
+        if (config.getBoolean("staffer.items.release.enabled"))
+            gui.setItem(releaseButton, config.getInt("staffer.items.release.slot"));
+        if (config.getBoolean("staffer.items.ban.enabled"))
+            gui.setItem(banButton, config.getInt("staffer.items.ban.slot"));
+
+        gui.show(sender);
     }
 }
