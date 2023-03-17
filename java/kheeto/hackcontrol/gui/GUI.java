@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GUI {
-    private int rows;
+    private final int rows;
+    @Getter
     private Inventory inventory;
     private List<GUIButton> buttons = new ArrayList<GUIButton>();
     private HackControl plugin;
@@ -26,8 +27,9 @@ public class GUI {
     public GUI(String title, int rows, boolean closeable) {
         this.plugin = HackControl.getInstance();
 
-        if (rows % 9 != 0) {
+        if ((rows * 9) % 9 != 0) {
             plugin.getLogger().info("Failed to initialize GUI \""+title+"\", invalid row count.");
+            this.rows = 0;
             return;
         }
 
