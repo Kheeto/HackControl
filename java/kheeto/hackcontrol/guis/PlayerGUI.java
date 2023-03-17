@@ -2,6 +2,7 @@ package kheeto.hackcontrol.guis;
 
 import kheeto.hackcontrol.HackControl;
 import kheeto.hackcontrol.commands.Control;
+import kheeto.hackcontrol.data.PlayerDataManager;
 import kheeto.hackcontrol.gui.GUI;
 import kheeto.hackcontrol.gui.GUIButton;
 import kheeto.hackcontrol.gui.GUIConfig;
@@ -21,23 +22,27 @@ public class PlayerGUI {
         FileConfiguration config = plugin.getConfig();
         FileConfiguration guiConfig = GUIConfig.getConfig();
 
-        GUI gui = new GUI(guiConfig.getString("player.title"), guiConfig.getInt("player.rows"), false);
+        GUI gui = new GUI(guiConfig.getString("player.title", "Hack Control"),
+                guiConfig.getInt("player.rows", 3), false);
 
         // Accept hack control button
         ItemStack accept = new ItemStack(
-                Material.getMaterial(guiConfig.getString("player.items.accept.material")));
+                Material.matchMaterial(guiConfig.getString("player.items.accept.material",
+                        "LIME_CONCRETE")));
         ItemMeta acceptMeta = accept.getItemMeta();
         acceptMeta.setDisplayName(guiConfig.getString("player.items.accept.name"));
         acceptMeta.setLore(guiConfig.getStringList("player.items.accept.lore"));
         accept.setItemMeta(acceptMeta);
         GUIButton acceptButton = new GUIButton(accept);
         acceptButton.setAction(() -> {
+            PlayerDataManager.getData(player).setCurrentGUI(null);
             player.closeInventory();
         });
 
         // Admit cheating button
         ItemStack admit = new ItemStack(
-                Material.getMaterial(guiConfig.getString("player.items.admit.material")));
+                Material.matchMaterial(guiConfig.getString("player.items.admit.material",
+                        "YELLOW_STAINED_GLASS")));
         ItemMeta admitMeta = admit.getItemMeta();
         admitMeta.setDisplayName(guiConfig.getString("player.items.admit.name"));
         admitMeta.setLore(guiConfig.getStringList("player.items.admit.lore"));
@@ -61,14 +66,17 @@ public class PlayerGUI {
 
         // Refuse hack control button
         ItemStack refuse = new ItemStack(
-                Material.getMaterial(guiConfig.getString("player.items.refuse.material")));
+                Material.matchMaterial(guiConfig.getString("player.items.refuse.material",
+                        "RED_CONCRETE")));
         ItemMeta refuseMeta = refuse.getItemMeta();
         refuseMeta.setDisplayName(guiConfig.getString("player.items.refuse.name"));
         refuseMeta.setLore(guiConfig.getStringList("player.items.refuse.lore"));
         refuse.setItemMeta(refuseMeta);
         GUIButton refuseButton = new GUIButton(refuse);
         refuseButton.setAction(() -> {
+            PlayerDataManager.getData(player).setCurrentGUI(null);
             player.closeInventory();
+
             Control.getInstance().EndControl(player,
                     Bukkit.getPlayer(Control.getInstance().getControlList().get(player)));
 
@@ -84,11 +92,11 @@ public class PlayerGUI {
         });
 
         if (config.getBoolean("player.items.accept.enabled"))
-            gui.setItem(acceptButton, config.getInt("players.items.accept.slot"));
+            gui.setItem(acceptButton, config.getInt("player.items.accept.slot"));
         if (config.getBoolean("player.items.admit.enabled"))
-            gui.setItem(admitButton, config.getInt("players.items.admit.slot"));
+            gui.setItem(admitButton, config.getInt("player.items.admit.slot"));
         if (config.getBoolean("player.items.refuse.enabled"))
-            gui.setItem(refuseButton, config.getInt("players.items.refuse.slot"));
+            gui.setItem(refuseButton, config.getInt("player.items.refuse.slot"));
 
         gui.show(player);
     }
