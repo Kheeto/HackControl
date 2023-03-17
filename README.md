@@ -15,7 +15,7 @@ then you can check if they are using cheats through third party tools.
 | Command    | Description |
 | ------------- |-------------|
 | /control start [player] | Starts an hack control |
-| /control cancel [player] | Ends an hack control |
+| /control end [player] | Ends an hack control |
 | /control setup | Lets you set spawn positions for the hack controls |
 | /control reload | Reloads the plugin configuration |
 | /freeze [player] <true/false> | Freeze or unfreeze a player |
@@ -25,8 +25,8 @@ then you can check if they are using cheats through third party tools.
 | ------------- |-------------|
 | hackcontrol.control | /control |
 | hackcontrol.control.start | /control start |
-| hackcontrol.control.cancel | /control cancel |
-| hackcontrol.control.cancel.others | /control cancel on players <br>controlled by other staffers |
+| hackcontrol.control.end | /control end |
+| hackcontrol.control.end.others | End hack controls of players <br>controlled by other staffers |
 | hackcontrol.control.setup | /control setup |
 | hackcontrol.control.reload | /control reload |
 | hackcontrol.control.bypass | You cannot hack control this player |
