@@ -381,17 +381,17 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
         Player sender = e.getPlayer();
 
         if (controlList.containsKey(sender.getUniqueId())) { // if a controlled player writes a message
-            Player staffer = Bukkit.getPlayer(controlList.get(sender));
+            Player staffer = Bukkit.getPlayer(controlList.get(sender.getUniqueId()));
 
             Message.send(sender, config.getString("controlChannel.playerPrefix")
                     .replace("{player}", sender.getName())
-                    .replace("{staffer}", staffer.getName())+ e.getMessage());
+                    .replace("{staffer}", staffer.getName())+ e.getMessage(), "");
             Message.send(staffer, config.getString("controlChannel.playerPrefix")
                     .replace("{player}", sender.getName())
-                    .replace("{staffer}", staffer.getName()) + e.getMessage());
+                    .replace("{staffer}", staffer.getName()) + e.getMessage(), "");
             e.setCancelled(true);
         }
-        else if (controlList.containsValue(sender)) { // if a staffer in hack control writes a message
+        else if (controlList.containsValue(sender.getUniqueId())) { // if a staffer in hack control writes a message
             Player player = null;
             // find the player he is controlling
             for (UUID u : controlList.keySet()) {
@@ -402,10 +402,10 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
 
             Message.send(player, config.getString("controlChannel.stafferPrefix")
                     .replace("{staffer}", sender.getName())
-                    .replace("{player}", player.getName())+ e.getMessage());
+                    .replace("{player}", player.getName())+ e.getMessage(), "");
             Message.send(sender, config.getString("controlChannel.stafferPrefix")
                     .replace("{staffer}", sender.getName())
-                    .replace("{player}", player.getName())+ e.getMessage());
+                    .replace("{player}", player.getName())+ e.getMessage(), "");
             e.setCancelled(true);
         }
     }
