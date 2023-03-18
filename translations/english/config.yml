@@ -1,0 +1,108 @@
+# HackControl plugin by Kheeto
+# Source code: https://github.com/Endless-Development/HackControl
+
+# {player} will be replaced with the target's name
+# {staffer} will be replaced with the message executor's name
+# Messages
+prefix: "&8[&3HackControl&8] "
+control:
+  stafferControlMessage: "&7You started an Hack Control on &3{player}"
+  stafferEndMessage: "&7You cancelled the Hack Control on &3{player}."
+  stafferEndMessageOther: "&7Your Hack Control on &3{player} &7was cancelled by &c{staffer}."
+  playerControlMessage: "&7An hack control was started on you! A staffer will check if you are using any cheats and in that case, he will ban you. &c&nDo not leave and listen to the instructions."
+  playerEndMessage: "&7Your Hack Control was cancelled."
+freeze:
+  stafferFreezeMessage: "&7You &cfrozen &7{player}."
+  stafferUnfreezeMessage: "&7You &aunfreezed &7{player}."
+  playerFreezeMessage: "&7You have been &cfrozen &7by a moderator."
+  playerUnfreezeMessage: "&7You have been &aunfreezed &7by a moderator."
+help:
+  control:
+    - "&8&m----[&3 HackControl &8&m]----"
+    - "&7/control start <player>"
+    - "&7/control end <player>"
+    - "&7/control setup <options>"
+    - "&7/control reload"
+    - "&8&m---------------------"
+  controlSetup:
+    - "&8&m----[&3 HackControl &8&m]----"
+    - "&7/control setup stafferPos"
+    - "&7/control setup playerPos"
+    - "&7/control setup endPos"
+    - "&8&m---------------------"
+errors:
+  noPlayer: "&cYou need to specify a player."
+  noPlayerFound: "&cThe player &4{player} &cwas not found online."
+  immunePlayer: "&cThe player &4{player} &cis immune to this command."
+  noPermission: "&cYou don't have the permission to execute that command."
+  notPlayer: "&cOnly players can execute this command!"
+  spawnLocations: "&cThere was an issue with loading the spawn locations."
+  notFrozen: "&4{player} &cis not currently frozen."
+  alreadyFrozen: "&4{player} &cis already frozen!"
+  alreadyControlled: "&4{player} &cis already in an hack control."
+  alreadyControlling: "&cYou are already controlling a player."
+  noControl: "&cThere is currently no hack control on &4{player}&c."
+  yourself: "&cYou cannot start an hack control on yourself."
+configReload: "&aYou successfully reloaded the config."
+setup:
+  stafferPos: "&eYou set the Staffer spawn position."
+  playerPos: "&eYou set the Player spawn position."
+  endPos: "&eYou set the end position."
+controlChannel:
+  stafferPrefix: "&8[&3HackControl&8] &7{staffer} &8» &r"
+  playerPrefix: "&8[&3HackControl&8] &7{player} &8» &r"
+
+# Should the player be automatically freezed in an hack control? (cannot move)
+freezeDuringControl: false
+# Ban user if he leaves during an hack control
+leaveBan:
+  enabled: false
+  ipBan: false
+  # Enter the time in hours! (can be decimal)
+  duration: 168
+  reason: "§cYou left during an hack control"
+# Ban duration for players who admit they are cheating
+# You can disable this in gui.yml
+admitBan:
+  ipBan: false
+  # Enter the time in hours! (can be decimal)
+  duration: 168
+  reason: "§cCheating through the use of unfair advantages"
+# Ban duration for players who refuse an hack control
+# You can disable this in gui.yml
+refuseBan:
+  ipBan: false
+  # Enter the time in hours! (can be decimal)
+  duration: 168
+  reason: "§cYou refused an hack control"
+# Ban duration for when the staffer found out the player was cheating
+# You can disable this in gui.yml
+cheatingBan:
+  ipBan: false
+  # Enter the time in hours! (can be decimal)
+  duration: 168
+  reason: "§cCheating through the use of unfair advantages"
+
+# Spawn Positions
+# You can edit these with /control setup
+stafferPos:
+  world: world
+  x: 0
+  y: 0
+  z: 0
+  yaw: 0.0
+  pitch: 0.0
+playerPos:
+  world: world
+  x: 0
+  y: 0
+  z: 0
+  yaw: 0.0
+  pitch: 0.0
+endPos:
+  world: world
+  x: 0
+  y: 0
+  z: 0
+  yaw: 0.0
+  pitch: 0.0
