@@ -6,10 +6,7 @@ import kheeto.hackcontrol.guis.PlayerGUI;
 import kheeto.hackcontrol.guis.StafferGUI;
 import kheeto.hackcontrol.util.Message;
 import lombok.Getter;
-import org.bukkit.BanList;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,13 +19,14 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.io.File;
 import java.util.*;
 
 public class Control implements CommandExecutor, TabCompleter, Listener {
 
     @Getter
     private static Control instance;
-    private HackControl plugin;
+    private final HackControl plugin;
     @Getter
     private Map<UUID, UUID> controlList; // PlayerUUID, StafferUUID
 
@@ -71,7 +69,7 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
                 return true;
             }
 
-            if (controlList.get(target) != null) {
+            if (controlList.get(target.getUniqueId()) != null) {
                 Message.send(sender, config.getString("errors.alreadyControlled")
                         .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
                 return true;
@@ -85,13 +83,13 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
             }
 
             // Player trying to hack control himself
-            if (target.getName() == sender.getName()) {
+            if (target.getName().equals(sender.getName())) {
                 Message.send(sender, config.getString("errors.yourself")
                         .replace("{player}", target.getName()).replace("{staffer}", sender.getName()));
                 return true;
             }
 
-            if (controlList.values().contains(((Player) sender).getUniqueId())) {
+            if (controlList.containsValue(((Player) sender).getUniqueId())) {
                 Message.send(sender, config.getString("errors.alreadyControlling")
                         .replace("{staffer}", sender.getName()).replace("{player}", target.getName()));
                 return true;
@@ -138,7 +136,12 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
                 controlList.remove(target.getUniqueId());
                 Message.send(sender, config.getString("control.stafferEndMessage")
                         .replace("{player}", target.getName()));
-                EndControl(target, Bukkit.getPlayer(controlList.get(target.getUniqueId())));
+
+                Player staffer = Bukkit.getPlayer(controlList.get(target.getUniqueId()));
+                Message.send(staffer, config.getString("control.stafferEndMessageOther")
+                        .replace("{player}", target.getName()));
+                Message.send(target, config.getString("control.playerEndMessage"));
+                EndControl(target, staffer);
                 return true;
             }
 
@@ -250,6 +253,7 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
             }
 
             plugin.reloadConfig();
+            LoadLocations();
             //GUIConfig.reload();
             Message.send(sender, config.getString("configReload")
                 .replace("{staffer}", sender.getName()));
@@ -267,8 +271,11 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
     private void StartControl(Player target, Player staffer) {
         FileConfiguration config = plugin.getConfig();
 
-        target.teleport(playerPos);
-        staffer.teleport(stafferPos);
+        if (playerPos != null) target.teleport(playerPos);
+        else plugin.getLogger().severe("playerPos location is invalid. Could not teleport player.");
+
+        if (stafferPos != null) staffer.teleport(stafferPos);
+        else plugin.getLogger().severe("stafferPos location is invalid. Could not teleport player.");
 
         if(config.getBoolean("freezeDuringControl")) {
             Freeze.getInstance().FreezePlayer(target);
@@ -276,13 +283,15 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
     }
 
     public void EndControl(Player target, Player staffer) {
-        if (controlList.containsKey(target))
-            controlList.remove(target);
+        controlList.remove(target.getUniqueId());
 
         FileConfiguration config = plugin.getConfig();
 
-        target.teleport(endPos);
-        staffer.teleport(endPos);
+        if (endPos != null && target != null) target.teleport(endPos);
+        else plugin.getLogger().severe("endPos location is invalid. Could not teleport player.");
+
+        if (endPos != null && staffer != null) staffer.teleport(endPos);
+        else plugin.getLogger().severe("endPos location is invalid. Could not teleport player.");
 
         if(config.getBoolean("freezeDuringControl")) {
             Freeze.getInstance().UnfreezePlayer(target);
@@ -300,12 +309,12 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
 
         String worldName = config.getString(name + ".world");
         if (worldName == null) {
-            Bukkit.getLogger().severe(name + ".world doesn't exist within config.yml, could not load spawn location.");
+            plugin.getLogger().severe(name + ".world doesn't exist within config.yml, could not load spawn location.");
             return null;
         }
-        World world = Bukkit.getWorld(worldName);
+        World world = getWorldByName(worldName);
         if (world == null) {
-            Bukkit.getLogger().severe("Could not find world \"" + worldName + "\", could not load spawn location.");
+            plugin.getLogger().severe("Could not find world \"" + worldName + "\", could not load spawn location.");
             return null;
         }
         int x = config.getInt(name + ".x");
@@ -362,7 +371,7 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
     private void onPlayerLeave(PlayerQuitEvent e) {
         if (!plugin.getConfig().getBoolean("leaveBan.enabled")) return;
 
-        if (controlList.containsKey(e.getPlayer())) {
+        if (controlList.containsKey(e.getPlayer().getUniqueId())) {
             long duration = System.currentTimeMillis() + 60*60*((long) (plugin.getConfig().getDouble("leaveBan.duration")*1000));
             Date date = new Date(duration);
 
@@ -408,5 +417,13 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
                     .replace("{player}", player.getName())+ e.getMessage(), "");
             e.setCancelled(true);
         }
+    }
+
+    public World getWorldByName(String name){
+        for(World w : plugin.getServer().getWorlds()){
+            if(w.getName().equals(name)) return w;
+        }
+
+        return Bukkit.getServer().createWorld(new WorldCreator(name));
     }
 }
