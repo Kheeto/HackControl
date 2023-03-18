@@ -2,7 +2,8 @@ name: HackControl
 version: ${project.version}
 main: kheeto.hackcontrol.HackControl
 api-version: 1.19
-prefix: [ HackControl ]
+prefix: HackControl
+load: POSTWORLD
 authors: [ Kheeto ]
 website: https://github.com/Endless-Development/HackControl
 commands:
