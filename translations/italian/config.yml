@@ -1,0 +1,107 @@
+# Plugin HackControl fatto da Kheeto
+# Codice sorgente: https://github.com/Endless-Development/HackControl
+
+# {player} sarà rimpiazzato con il nome del giocatore sotto controllo hack
+# {staffer} sarà rimpiazzato con il nome di chi esegue il comando
+# Messaggi
+prefix: '&8[&3HackControl&8] '
+control:
+  stafferControlMessage: '&7Hai messo &3{player} &7in controllo hack.'
+  stafferEndMessage: '&7Hai annullato il controllo hack su &3{player}.'
+  stafferEndMessageOther: '&7Il tuo controllo hack su &3{player} &7è stato annullato
+    da &c{staffer}.'
+  playerControlMessage: '&7Sei in controllo hack! Uno staffer controllerà se stai
+    usando i cheat, e in caso ti bannerà. &c&nNon uscire e ascolta le istruzioni.'
+  playerEndMessage: '&7Il tuo controllo hack è stato annullato.'
+freeze:
+  stafferFreezeMessage: '&7Hai &ccongelato &7{player}.'
+  stafferUnfreezeMessage: '&7Hai &ascongelato &7{player}.'
+  playerFreezeMessage: '&7Sei stato &ccongelato &7da uno staffer.'
+  playerUnfreezeMessage: '&7Sei stato &ascongelato &7da uno staffer.'
+help:
+  control:
+  - '&8&m----[&3 HackControl &8&m]----'
+  - '&7/control start <player>'
+  - '&7/control end <player>'
+  - '&7/control setup <options>'
+  - '&7/control reload'
+  - '&8&m---------------------'
+  controlSetup:
+  - '&8&m----[&3 HackControl &8&m]----'
+  - '&7/control setup stafferPos'
+  - '&7/control setup playerPos'
+  - '&7/control setup endPos'
+  - '&8&m---------------------'
+errors:
+  noPlayer: '&cDevi specificare un player.'
+  noPlayerFound: '&cIl giocatore &4{player} &cnon è online.'
+  immunePlayer: '&cIl giocatore &4{player} &cè immune a questo comando.'
+  noPermission: '&cNon ne hai i permessi adatti.'
+  notPlayer: '&cSolo i giocatori possono eseguire questo comando.'
+  spawnLocations: '&cC''è stato un errore a caricare le posizioni di spawn.'
+  notFrozen: '&4{player} &cnon è congelato.'
+  alreadyFrozen: '&4{player} &cè già congelato!'
+  alreadyControlled: '&4{player} &cè già in un controllo hack.'
+  alreadyControlling: '&cStai già controllando un giocatore.'
+  noControl: '&4{player} &cnon è in un controllo hack.'
+  yourself: '&cNon puoi fare un controllo hack a te stesso.'
+configReload: '&aHai ricaricato la configurazione.'
+setup:
+  stafferPos: '&eHai impostato lo spawn dello Staffer.'
+  playerPos: '&eHai impostato lo spawn del Player.'
+  endPos: '&eHai impostato la posizione finale.'
+controlChannel:
+  stafferPrefix: '&8[&3HackControl&8] &7{staffer} &8» &r'
+  playerPrefix: '&8[&3HackControl&8] &7{player} &8» &r'
+
+# Il player dovrebbe essere freezato durante un controllo?
+freezeDuringControl: false
+# Banna un player se esce durante il controllo
+leaveBan:
+  enabled: false
+  ipBan: false
+  # Scrivi il numero di ore
+  duration: 168
+  reason: §cSei uscito durante un controllo hack
+# Ban per i player che ammettono di usare i cheat
+admitBan:
+  ipBan: false
+  # Scrivi il numero di ore
+  duration: 168
+  reason: §cUso di cheat/hack
+# Ban per i player che rifiutano un controllo hack
+refuseBan:
+  ipBan: false
+  # Scrivi il numero di ore
+  duration: 168
+  reason: §cRifiuto di controllo hack
+# Ban per quando gli staffer scoprono che il player stava usando i cheat
+cheatingBan:
+  ipBan: false
+  # Scrivi il numero di ore
+  duration: 168
+  reason: §cUso di cheat/hack
+
+# Posizioni del controllo hack
+# Puoi impostarle dal gioco con /control setup
+stafferPos:
+  world: world
+  x: 0
+  y: 0
+  z: 0
+  yaw: 0.0
+  pitch: 0.0
+playerPos:
+  world: world
+  x: 0
+  y: 0
+  z: 0
+  yaw: 0.0
+  pitch: 0.0
+endPos:
+  world: world
+  x: 0
+  y: 0
+  z: 0
+  yaw: 0.0
+  pitch: 0.0
