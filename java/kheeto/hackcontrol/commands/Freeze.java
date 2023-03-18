@@ -16,6 +16,9 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDropItemEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
@@ -26,12 +29,12 @@ public class Freeze implements CommandExecutor, Listener, TabCompleter {
     @Getter
     private static Freeze instance;
     private HackControl plugin;
-    private static List<Player> frozenPlayers;
+    private static List<UUID> frozenPlayers;
 
     public Freeze(HackControl plugin) {
         instance = this;
         this.plugin = plugin;
-        List<Player> list = Arrays.asList();
+        List<UUID> list = Arrays.asList();
         frozenPlayers = new ArrayList<>(list);
     }
 
@@ -65,15 +68,15 @@ public class Freeze implements CommandExecutor, Listener, TabCompleter {
         }
 
         if (args.length == 1) {
-            if (frozenPlayers.contains(p)) {
-                frozenPlayers.remove(p);
+            if (frozenPlayers.contains(p.getUniqueId())) {
+                frozenPlayers.remove(p.getUniqueId());
                 Message.send(sender, config.getString("freeze.stafferUnfreezeMessage")
                         .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
                 Message.send(p, config.getString("freeze.playerUnfreezeMessage")
                         .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
                 return true;
-            } else if (!frozenPlayers.contains(p)) {
-                frozenPlayers.add(p);
+            } else if (!frozenPlayers.contains(p.getUniqueId())) {
+                frozenPlayers.add(p.getUniqueId());
                 Message.send(sender, config.getString("freeze.stafferFreezeMessage")
                         .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
                 Message.send(p, config.getString("freeze.playerFreezeMessage")
@@ -82,26 +85,26 @@ public class Freeze implements CommandExecutor, Listener, TabCompleter {
             }
         } else if (args.length > 1) {
             if (Boolean.parseBoolean(args[1])) {
-                if (frozenPlayers.contains(p)) {
+                if (frozenPlayers.contains(p.getUniqueId())) {
                     Message.send(sender, config.getString("errors.alreadyFrozen")
                             .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
                     return true;
                 }
 
-                frozenPlayers.add(p);
+                frozenPlayers.add(p.getUniqueId());
                 Message.send(sender, config.getString("freeze.stafferFreezeMessage")
                         .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
                 Message.send(p, config.getString("freeze.playerFreezeMessage")
                         .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
                 return true;
             } else {
-                if (!frozenPlayers.contains(p)) {
+                if (!frozenPlayers.contains(p.getUniqueId())) {
                     Message.send(sender, config.getString("errors.notFrozen")
                             .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
                     return true;
                 }
 
-                frozenPlayers.remove(p);
+                frozenPlayers.remove(p.getUniqueId());
                 Message.send(sender, config.getString("freeze.stafferUnfreezeMessage")
                         .replace("{player}", p.getName()).replace("{staffer}", sender.getName()));
                 Message.send(p, config.getString("freeze.playerUnfreezeMessage")
@@ -114,50 +117,76 @@ public class Freeze implements CommandExecutor, Listener, TabCompleter {
 
     @EventHandler
     private void onPlayerMove(PlayerMoveEvent e) {
-        if (frozenPlayers.contains(e.getPlayer()))
+        if (frozenPlayers.contains(e.getPlayer().getUniqueId()))
             e.setCancelled(true);
     }
 
     @EventHandler
     private void onPlayerDestroyBlock(BlockBreakEvent e) {
-        if (frozenPlayers.contains(e.getPlayer()))
+        if (frozenPlayers.contains(e.getPlayer().getUniqueId()))
             e.setCancelled(true);
     }
 
     @EventHandler
     private void onPlayerPlaceBlock(BlockPlaceEvent e) {
-        if (frozenPlayers.contains(e.getPlayer()))
+        if (frozenPlayers.contains(e.getPlayer().getUniqueId()))
             e.setCancelled(true);
     }
 
     @EventHandler
     private void onPlayerDamageBlock(BlockDamageEvent e) {
-        if (frozenPlayers.contains(e.getPlayer()))
+        if (frozenPlayers.contains(e.getPlayer().getUniqueId()))
             e.setCancelled(true);
     }
 
     @EventHandler
     private void onPlayerInteract(PlayerInteractEvent e) {
-        if (frozenPlayers.contains(e.getPlayer()))
+        if (frozenPlayers.contains(e.getPlayer().getUniqueId()))
             e.setCancelled(true);
     }
 
     @EventHandler
     private void onPlayerPvP(EntityDamageByEntityEvent e) {
-        if (frozenPlayers.contains(e.getDamager()))
+        if (frozenPlayers.contains(e.getDamager().getUniqueId()))
             e.setCancelled(true);
-        if (frozenPlayers.contains(e.getEntity()))
+        if (frozenPlayers.contains(e.getEntity().getUniqueId()))
             e.setCancelled(true);
+    }
+
+    @EventHandler
+    private void onEntityTargetPlayer(EntityTargetEvent e) {
+        if (e.getTarget() instanceof Player) {
+            if (frozenPlayers.contains(((Player)e.getTarget()).getUniqueId()))
+                e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    private void onPlayerPickupItem(EntityPickupItemEvent e) {
+        if (e.getEntity() instanceof Player) {
+            if (frozenPlayers.contains(((Player)e.getEntity()).getUniqueId())) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    private void onPlayerDropItem(EntityDropItemEvent e) {
+        if (e.getEntity() instanceof Player) {
+            if (frozenPlayers.contains(((Player)e.getEntity()).getUniqueId())) {
+                e.setCancelled(true);
+            }
+        }
     }
 
     public void FreezePlayer(Player p) {
-        if (!frozenPlayers.contains(p))
-            frozenPlayers.add(p);
+        if (!frozenPlayers.contains(p.getUniqueId()))
+            frozenPlayers.add(p.getUniqueId());
     }
 
     public void UnfreezePlayer(Player p) {
-        if (frozenPlayers.contains(p))
-            frozenPlayers.remove(p);
+        if (frozenPlayers.contains(p.getUniqueId()))
+            frozenPlayers.remove(p.getUniqueId());
     }
 
     @Override
