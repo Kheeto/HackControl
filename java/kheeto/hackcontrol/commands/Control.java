@@ -136,7 +136,7 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
             // Executed from console
             if (!(sender instanceof Player)) {
                 controlList.remove(target.getUniqueId());
-                Message.send(sender, config.getString("stafferEndMessage")
+                Message.send(sender, config.getString("control.stafferEndMessage")
                         .replace("{player}", target.getName()));
                 EndControl(target, Bukkit.getPlayer(controlList.get(target.getUniqueId())));
                 return true;
@@ -250,7 +250,7 @@ public class Control implements CommandExecutor, TabCompleter, Listener {
             }
 
             plugin.reloadConfig();
-            GUIConfig.reload();
+            //GUIConfig.reload();
             Message.send(sender, config.getString("configReload")
                 .replace("{staffer}", sender.getName()));
             return true;
