@@ -19,6 +19,6 @@ public class Message {
     }
 
     public static void send(Player target, String message, String prefix) {
-        target.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + message));
+        if (target != null) target.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + message));
     }
 }
